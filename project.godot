@@ -1,0 +1,62 @@
+; Engine configuration file.
+; It's best edited using the editor UI and not directly,
+; since the parameters that go here are not all obvious.
+;
+; Format:
+;   [section] ; section goes between []
+;   param=value ; assign values to parameters
+
+config_version=5
+
+[application]
+
+config/name="Office Plus One"
+run/main_scene="res://scenes/main.tscn"
+config/features=PackedStringArray("4.7", "Mobile")
+config/icon="res://icon.svg"
+
+[audio]
+
+driver/enable_input=true
+general/text_to_speech=true
+input/transcribe/use_gpu=false
+
+[autoload]
+
+Config="*res://scripts/autoload/config.gd"
+Net="*res://scripts/autoload/net.gd"
+Office="*res://scripts/autoload/office.gd"
+Files="*res://scripts/autoload/files.gd"
+Sync="*res://scripts/autoload/sync.gd"
+Voice="*res://scripts/autoload/voice.gd"
+AI="*res://scripts/autoload/ai.gd"
+Saves="*res://scripts/autoload/saves.gd"
+Widgets="*res://scripts/autoload/widgets.gd"
+
+[display]
+
+window/stretch/mode="canvas_items"
+window/stretch/aspect="expand"
+window/vsync/vsync_mode=0
+
+[physics]
+
+3d/physics_engine="Jolt Physics"
+common/physics_ticks_per_second=90
+common/max_physics_steps_per_frame=4
+
+[rendering]
+
+rendering_device/driver.windows="d3d12"
+renderer/rendering_method="mobile"
+textures/vram_compression/import_etc2_astc=true
+
+[xr]
+
+openxr/enabled=true
+openxr/extensions/hand_tracking=true
+openxr/extensions/hand_tracking_unobstructed_data_source=true
+openxr/extensions/hand_tracking_controller_data_source=true
+openxr/extensions/hand_interaction_profile=true
+openxr/extensions/meta/hand_tracking_aim=true
+shaders/enabled=true

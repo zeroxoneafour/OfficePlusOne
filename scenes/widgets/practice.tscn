@@ -1,0 +1,92 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/widgets/practice.gd" id="1"]
+[ext_resource type="PackedScene" path="res://scenes/world/poke_button.tscn" id="2"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_1"]
+albedo_color = Color(0.1686, 0.1843, 0.2275, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_2"]
+size = Vector3(1.05, 0.85, 0.03)
+material = SubResource("StandardMaterial3D_1")
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_3"]
+size = Vector3(1.05, 0.85, 0.03)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_4"]
+albedo_color = Color(0.1137, 0.1333, 0.1882, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_5"]
+size = Vector3(1, 0.8, 0.004)
+material = SubResource("StandardMaterial3D_4")
+
+[node name="Practice" type="RigidBody3D"]
+script = ExtResource("1")
+mass = 20.0
+size = Vector2(1, 0.8)
+
+[node name="Frame" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.015)
+mesh = SubResource("BoxMesh_2")
+
+[node name="FrameShape" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.015)
+shape = SubResource("BoxShape3D_3")
+
+[node name="Face" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.002)
+mesh = SubResource("BoxMesh_5")
+unique_name_in_owner = true
+
+[node name="Name" type="Label3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5, 0.465, 0)
+pixel_size = 0.001
+text = ""
+font_size = 64
+outline_size = 8
+unique_name_in_owner = true
+horizontal_alignment = 0
+
+[node name="MenuButton" parent="." instance=ExtResource("2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.445, 0.465, 0.005)
+unique_name_in_owner = true
+text = "Menu"
+size = Vector2(0.11, 0.06)
+label_size = 30
+color = Color(0.3333, 0.3529, 0.4, 1)
+
+[node name="Score" type="Label3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.34, 0.006)
+pixel_size = 0.001
+text = ""
+font_size = 40
+outline_size = 0
+unique_name_in_owner = true
+modulate = Color(0.949, 0.8157, 0.4196, 1)
+
+[node name="Reset" parent="." instance=ExtResource("2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.3, -0.33, 0.005)
+unique_name_in_owner = true
+text = "Reset"
+size = Vector2(0.2, 0.07)
+label_size = 34
+color = Color(0.3333, 0.3529, 0.4, 1)
+
+[node name="TryKeyboard" parent="." instance=ExtResource("2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.2, -0.33, 0.005)
+unique_name_in_owner = true
+text = "Try the keyboard"
+size = Vector2(0.4, 0.07)
+label_size = 34
+color = Color(0.4824, 0.4078, 0.9333, 1)
+
+[node name="Typed" type="Label3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.24, 0.006)
+pixel_size = 0.001
+text = ""
+font_size = 30
+outline_size = 0
+unique_name_in_owner = true
+modulate = Color(1, 1, 1, 1)
+autowrap_mode = 3
+width = 900

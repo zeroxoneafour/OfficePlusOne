@@ -1,0 +1,15 @@
+[configuration]
+
+entry_symbol = "godot_whisper_library_init"
+compatibility_minimum = 4.2
+
+; Trimmed to the platforms Office Plus One ships on. The full release
+; (appsinacup/godot-whisper v2.0.3) also has macOS/iOS/web/x86 builds.
+[libraries]
+
+linux.debug.x86_64 = "bin/libgodot_whisper.linux.template_release.x86_64.so"
+linux.release.x86_64 = "bin/libgodot_whisper.linux.template_release.x86_64.so"
+windows.debug.x86_64 = "bin/libgodot_whisper.windows.template_release.x86_64.dll"
+windows.release.x86_64 = "bin/libgodot_whisper.windows.template_release.x86_64.dll"
+android.debug.arm64 = "bin/libgodot_whisper.android.template_release.arm64.so"
+android.release.arm64 = "bin/libgodot_whisper.android.template_release.arm64.so"

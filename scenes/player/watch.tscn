@@ -1,0 +1,114 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/player/watch.gd" id="1"]
+[ext_resource type="PackedScene" path="res://scenes/world/poke_button.tscn" id="2"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_1"]
+albedo_color = Color(0.1098, 0.1137, 0.1333, 1)
+roughness = 0.6
+
+[sub_resource type="TorusMesh" id="TorusMesh_2"]
+inner_radius = 0.028
+outer_radius = 0.036
+rings = 24
+ring_segments = 8
+material = SubResource("StandardMaterial3D_1")
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_3"]
+albedo_color = Color(0.1686, 0.1765, 0.2, 1)
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_4"]
+top_radius = 0.046
+bottom_radius = 0.046
+height = 0.01
+radial_segments = 32
+material = SubResource("StandardMaterial3D_3")
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_5"]
+albedo_color = Color(0.02745, 0.03137, 0.03922, 1)
+shading_mode = 0
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_6"]
+top_radius = 0.041
+bottom_radius = 0.041
+height = 0.002
+radial_segments = 32
+material = SubResource("StandardMaterial3D_5")
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_7"]
+albedo_color = Color(1, 0.251, 0.251, 1)
+shading_mode = 0
+
+[sub_resource type="SphereMesh" id="SphereMesh_8"]
+radius = 0.0035
+height = 0.007
+radial_segments = 8
+rings = 4
+material = SubResource("StandardMaterial3D_7")
+
+[sub_resource type="SphereMesh" id="SphereMesh_9"]
+radius = 0.0035
+height = 0.007
+radial_segments = 8
+rings = 4
+material = SubResource("StandardMaterial3D_7")
+
+[node name="Watch" type="Node3D"]
+visible = false
+script = ExtResource("1")
+
+[node name="Band" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0, 1, 0, -1, 0, 0, -0.005, 0)
+mesh = SubResource("TorusMesh_2")
+
+[node name="Face" type="Node3D" parent="."]
+unique_name_in_owner = true
+
+[node name="Bezel" type="MeshInstance3D" parent="Face"]
+transform = Transform3D(1, 0, 0, 0, 0, 1, 0, -1, 0, 0, 0, 0)
+mesh = SubResource("CylinderMesh_4")
+
+[node name="Screen" type="MeshInstance3D" parent="Face"]
+transform = Transform3D(1, 0, 0, 0, 0, 1, 0, -1, 0, 0, 0, 0.0055)
+mesh = SubResource("CylinderMesh_6")
+
+[node name="Time" type="Label3D" parent="Face"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.014, 0.0075)
+pixel_size = 0.00032
+text = "12:00"
+font_size = 60
+outline_size = 0
+unique_name_in_owner = true
+modulate = Color(0.9098, 0.9569, 1, 1)
+
+[node name="MeButton" parent="Face" instance=ExtResource("2")]
+unique_name_in_owner = true
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.0175, -0.019, 0.006)
+text = "Me"
+color = Color(0.2392, 0.5216, 0.7765, 1)
+size = Vector2(0.03, 0.017)
+label_size = 16
+
+[node name="RoomButton" parent="Face" instance=ExtResource("2")]
+unique_name_in_owner = true
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0175, -0.019, 0.006)
+text = "Room"
+color = Color(0.4824, 0.4078, 0.9333, 1)
+size = Vector2(0.03, 0.017)
+label_size = 16
+
+[node name="MeBadge" type="MeshInstance3D" parent="Face"]
+unique_name_in_owner = true
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.004, -0.009, 0.012)
+mesh = SubResource("SphereMesh_8")
+
+[node name="RoomBadge" type="MeshInstance3D" parent="Face"]
+unique_name_in_owner = true
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.031, -0.009, 0.012)
+mesh = SubResource("SphereMesh_9")
+
+[node name="MenuAnchor" type="Node3D" parent="Face"]
+unique_name_in_owner = true
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.13, 0.01)

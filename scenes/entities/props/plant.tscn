@@ -1,0 +1,53 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/entities/prop.gd" id="1"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_1"]
+albedo_color = Color(0.7098, 0.3961, 0.1137, 1)
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_2"]
+top_radius = 0.13
+bottom_radius = 0.13
+height = 0.28
+radial_segments = 16
+material = SubResource("StandardMaterial3D_1")
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_3"]
+radius = 0.13
+height = 0.28
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_4"]
+albedo_color = Color(0.2275, 0.4902, 0.2667, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_5"]
+radius = 0.24
+height = 0.48
+radial_segments = 16
+rings = 8
+material = SubResource("StandardMaterial3D_4")
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_6"]
+radius = 0.24
+
+[node name="Plant" type="RigidBody3D"]
+mass = 4.0
+script = ExtResource("1")
+
+[node name="Pot" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+mesh = SubResource("CylinderMesh_2")
+
+[node name="PotShape" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+shape = SubResource("CylinderShape3D_3")
+
+[node name="Leaves" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.34, 0)
+mesh = SubResource("SphereMesh_5")
+
+[node name="LeavesShape" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.34, 0)
+shape = SubResource("SphereShape3D_6")
+
+[node name="GrabPoint" type="Marker3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, 0)

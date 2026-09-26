@@ -1,0 +1,77 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/entities/prop.gd" id="1"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_1"]
+albedo_color = Color(0.2, 0.2, 0.2, 1)
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_2"]
+top_radius = 0.15
+bottom_radius = 0.15
+height = 0.04
+radial_segments = 16
+material = SubResource("StandardMaterial3D_1")
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_3"]
+radius = 0.15
+height = 0.04
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_4"]
+albedo_color = Color(0.3333, 0.3333, 0.3333, 1)
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_5"]
+top_radius = 0.02
+bottom_radius = 0.02
+height = 1.2
+radial_segments = 16
+material = SubResource("StandardMaterial3D_4")
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_6"]
+radius = 0.02
+height = 1.2
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_7"]
+albedo_color = Color(1, 0.949, 0.7529, 1)
+emission_enabled = true
+emission = Color(1, 0.949, 0.7529, 1)
+emission_energy_multiplier = 2
+
+[sub_resource type="SphereMesh" id="SphereMesh_8"]
+radius = 0.14
+height = 0.28
+radial_segments = 16
+rings = 8
+material = SubResource("StandardMaterial3D_7")
+
+[node name="Lamp" type="RigidBody3D"]
+mass = 3.0
+script = ExtResource("1")
+
+[node name="Base" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.6, 0)
+mesh = SubResource("CylinderMesh_2")
+
+[node name="BaseShape" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.6, 0)
+shape = SubResource("CylinderShape3D_3")
+
+[node name="Pole" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+mesh = SubResource("CylinderMesh_5")
+
+[node name="PoleShape" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+shape = SubResource("CylinderShape3D_6")
+
+[node name="Bulb" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.66, 0)
+mesh = SubResource("SphereMesh_8")
+
+[node name="Light" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.66, 0)
+light_color = Color(1, 0.9098, 0.6902, 1)
+light_energy = 0.8
+omni_range = 5.0
+
+[node name="GrabPoint" type="Marker3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 0)

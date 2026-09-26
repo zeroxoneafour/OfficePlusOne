@@ -1,0 +1,116 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/widgets/whiteboard_widget.gd" id="1"]
+[ext_resource type="PackedScene" path="res://scenes/world/poke_button.tscn" id="2"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_1"]
+albedo_color = Color(0.1686, 0.1843, 0.2275, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_2"]
+size = Vector3(1.65, 0.95, 0.03)
+material = SubResource("StandardMaterial3D_1")
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_3"]
+size = Vector3(1.65, 0.95, 0.03)
+
+[sub_resource type="QuadMesh" id="QuadMesh_4"]
+resource_local_to_scene = true
+size = Vector2(1.6, 0.9)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_5"]
+resource_local_to_scene = true
+shading_mode = 0
+
+[sub_resource type="QuadMesh" id="QuadMesh_6"]
+resource_local_to_scene = true
+size = Vector2(0.5, 0.5)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_7"]
+resource_local_to_scene = true
+shading_mode = 0
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_8"]
+albedo_color = Color(0.1686, 0.1843, 0.2275, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_9"]
+size = Vector3(1.65, 0.08, 0.02)
+material = SubResource("StandardMaterial3D_8")
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_10"]
+size = Vector3(1.65, 0.08, 0.02)
+
+[node name="Whiteboard" type="RigidBody3D"]
+script = ExtResource("1")
+mass = 20.0
+size = Vector2(1.6, 0.9)
+
+[node name="Frame" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.015)
+mesh = SubResource("BoxMesh_2")
+
+[node name="FrameShape" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.015)
+shape = SubResource("BoxShape3D_3")
+
+[node name="Name" type="Label3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.8, 0.515, 0)
+pixel_size = 0.001
+text = ""
+font_size = 64
+outline_size = 8
+unique_name_in_owner = true
+horizontal_alignment = 0
+
+[node name="MenuButton" parent="." instance=ExtResource("2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.745, 0.515, 0.005)
+unique_name_in_owner = true
+text = "Menu"
+size = Vector2(0.11, 0.06)
+label_size = 30
+color = Color(0.3333, 0.3529, 0.4, 1)
+
+[node name="Drawing" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.004)
+mesh = SubResource("QuadMesh_4")
+material_override = SubResource("StandardMaterial3D_5")
+unique_name_in_owner = true
+
+[node name="Title" type="Label3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.75, 0.41, 0.006)
+pixel_size = 0.0012
+text = ""
+font_size = 64
+outline_size = 0
+unique_name_in_owner = true
+modulate = Color(0.1059, 0.1059, 0.1059, 1)
+autowrap_mode = 3
+width = 1250
+horizontal_alignment = 0
+vertical_alignment = 0
+
+[node name="Text" type="Label3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.75, 0.32, 0.006)
+pixel_size = 0.0012
+text = ""
+font_size = 46
+outline_size = 0
+unique_name_in_owner = true
+modulate = Color(0.1098, 0.2471, 0.5608, 1)
+autowrap_mode = 3
+width = 1250
+horizontal_alignment = 0
+vertical_alignment = 0
+
+[node name="Picture" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.005)
+mesh = SubResource("QuadMesh_6")
+material_override = SubResource("StandardMaterial3D_7")
+unique_name_in_owner = true
+
+[node name="PaletteBar" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.51, -0.012)
+mesh = SubResource("BoxMesh_9")
+
+[node name="PaletteBarShape" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.51, -0.012)
+shape = SubResource("BoxShape3D_10")

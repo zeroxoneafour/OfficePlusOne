@@ -1,0 +1,33 @@
+[gd_scene format=3 uid="uid://c24duaxpgd2h0"]
+
+[ext_resource type="Script" uid="uid://cpcabshjno2qn" path="res://scripts/main.gd" id="1"]
+
+[sub_resource type="Environment" id="Environment_1"]
+background_mode = 1
+background_color = Color(0.1255, 0.1373, 0.1647, 1)
+ambient_light_source = 2
+ambient_light_color = Color(0.6039, 0.6431, 0.7216, 1)
+ambient_light_energy = 0.6
+tonemap_mode = 2
+
+[node name="Main" type="Node3D" unique_id=1144459183]
+script = ExtResource("1")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=301892440]
+environment = SubResource("Environment_1")
+
+[node name="Sun" type="DirectionalLight3D" parent="." unique_id=1998449391]
+transform = Transform3D(0.866025, 0, -0.5, -0.409576, 0.573576, -0.709406, 0.286788, 0.819152, 0.496732, 0, 0, 0)
+light_energy = 0.5
+
+[node name="World" type="Node3D" parent="." unique_id=933547862]
+unique_name_in_owner = true
+
+[node name="RoomRoot" type="Node3D" parent="World" unique_id=759273805]
+unique_name_in_owner = true
+
+[node name="Entities" type="Node3D" parent="World" unique_id=782574111]
+unique_name_in_owner = true
+
+[node name="Avatars" type="Node3D" parent="World" unique_id=1058843127]
+unique_name_in_owner = true

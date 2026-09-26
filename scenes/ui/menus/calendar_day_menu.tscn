@@ -1,0 +1,7 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/ui/radial_menu.tscn" id="1"]
+[ext_resource type="Script" path="res://scripts/ui/menus/calendar_day_menu.gd" id="2"]
+
+[node name="CalendarDayMenu" instance=ExtResource("1")]
+script = ExtResource("2")

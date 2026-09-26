@@ -1,0 +1,24 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/world/room.gd" id="1"]
+
+[node name="Room" type="Node3D"]
+script = ExtResource("1")
+
+[node name="Shell" type="Node3D" parent="."]
+unique_name_in_owner = true
+
+[node name="Light" type="OmniLight3D" parent="."]
+unique_name_in_owner = true
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.7, 0)
+light_energy = 1.2
+omni_range = 12.0
+omni_attenuation = 0.6
+
+[node name="OfficeName" type="Label3D" parent="."]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 0, 0, 0)
+pixel_size = 0.001
+text = ""
+font_size = 96
+outline_size = 8
+unique_name_in_owner = true

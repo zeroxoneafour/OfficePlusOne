@@ -1,0 +1,71 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/radial_menu.gd" id="1"]
+[ext_resource type="PackedScene" path="res://scenes/ui/radial_button.tscn" id="2"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_1"]
+albedo_color = Color(0.06275, 0.07059, 0.09412, 0.72)
+transparency = 1
+shading_mode = 0
+cull_mode = 2
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_2"]
+top_radius = 0.24
+bottom_radius = 0.24
+height = 0.004
+radial_segments = 48
+material = SubResource("StandardMaterial3D_1")
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_3"]
+albedo_color = Color(0.4824, 0.4078, 0.9333, 1)
+shading_mode = 0
+emission_enabled = true
+emission = Color(0.4824, 0.4078, 0.9333, 1)
+emission_energy_multiplier = 1.5
+
+[sub_resource type="TorusMesh" id="TorusMesh_4"]
+inner_radius = 0.232
+outer_radius = 0.24
+rings = 48
+ring_segments = 6
+material = SubResource("StandardMaterial3D_3")
+
+[node name="RadialMenu" type="Node3D"]
+script = ExtResource("1")
+
+[node name="Disc" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0, 1, 0, -1, 0, 0, 0, -0.01)
+mesh = SubResource("CylinderMesh_2")
+
+[node name="Ring" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0, 1, 0, -1, 0, 0, 0, -0.008)
+mesh = SubResource("TorusMesh_4")
+
+[node name="Title" type="Label3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.29, 0)
+pixel_size = 0.0006
+text = ""
+font_size = 36
+outline_size = 8
+unique_name_in_owner = true
+autowrap_mode = 3
+width = 700
+
+[node name="Hint" type="Label3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.29, 0)
+pixel_size = 0.0006
+text = ""
+font_size = 22
+outline_size = 8
+unique_name_in_owner = true
+modulate = Color(0.7333, 0.7333, 0.7333, 1)
+autowrap_mode = 3
+width = 700
+
+[node name="Buttons" type="Node3D" parent="."]
+unique_name_in_owner = true
+
+[node name="Cancel" parent="." instance=ExtResource("2")]
+unique_name_in_owner = true
+text = "Cancel"
+color = Color(0.7529, 0.3137, 0.302, 1)
