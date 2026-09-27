@@ -65,14 +65,23 @@ s.save("scenes/widgets/timer.tscn")
 # --- Whiteboard ---------------------------------------------------------------------------
 w, h = 1.6, 0.9
 s = widget("Whiteboard", "res://scripts/widgets/whiteboard_widget.gd", w, h)
+# The canvas: the drawing, with the text and picture layer over it (both
+# scroll together; see whiteboard_widget.gd).
 s.quad("Drawing", (w, h), pos=(0, 0, 0.004))
-s.label("Title", "", 64, pos=(-w / 2 + 0.05, h / 2 - 0.04, 0.006), pixel=0.0012, width=(w - 0.1) / 0.0012,
-        color="#1b1b1b", outline=0, halign=0, valign=0)
-s.label("Text", "", 46, pos=(-w / 2 + 0.05, h / 2 - 0.13, 0.006), pixel=0.0012, width=(w - 0.1) / 0.0012,
-        color="#1c3f8f", outline=0, halign=0, valign=0)
-s.quad("Picture", (0.5, 0.5), pos=(0, 0, 0.005))
+s.quad("Layer", (w, h), pos=(0, 0, 0.005))
+s.node("LayerViewport", "SubViewport", unique_name_in_owner="true", transparent_bg="true", disable_3d="true",
+       render_target_update_mode="1", size="Vector2i(1024, 576)")
+s.node("Words", "RichTextLabel", "LayerViewport", unique_name_in_owner="true", bbcode_enabled="true",
+       scroll_active="false", autowrap_mode="3", text=q(""))
+s.node("Picture", "TextureRect", "LayerViewport", unique_name_in_owner="true", expand_mode="1", stretch_mode="5")
 # The brush palette (built in code) sits on this strip under the board.
 s.box("PaletteBar", (w + 0.05, 0.08, 0.02), "#2b2f3a", pos=(0, -h / 2 - 0.06, -0.012), collide=True)
+# Scrolling, when the text makes the canvas taller than the board.
+s.box("ScrollBar", (0.08, h + 0.05, 0.02), "#2b2f3a", pos=(w / 2 + 0.065, 0, -0.012), collide=True)
+button(s, "ScrollUp", "^", (w / 2 + 0.065, h / 2 - 0.05, 0.0), (0.06, 0.07), "#555a66", 40)
+button(s, "ScrollDown", "v", (w / 2 + 0.065, -h / 2 + 0.05, 0.0), (0.06, 0.07), "#555a66", 40)
+s.box("ScrollTrack", (0.014, h - 0.26, 0.004), "#555a66", pos=(w / 2 + 0.065, 0, 0.001), unique=True)
+s.box("ScrollThumb", (0.03, 0.1, 0.008), "#f2d06b", pos=(w / 2 + 0.065, 0, 0.005), unique=True)
 s.save("scenes/widgets/whiteboard.tscn")
 
 # --- Practice board (tutorial) ---------------------------------------------------------------
@@ -104,6 +113,16 @@ button(s, "KeyboardButton", "Keyboard", (0.22, 0.2, 0.0), (0.14, 0.04), "#4caf50
 s.node("GrabPoint", "Marker3D", transform=T(0, 0.14, -0.04))
 s.save("scenes/entities/props/monitor.tscn")
 
+# --- Floating screen (no physics; hangs where you put it) --------------------------------------
+s = Scene("FloatingScreen", "RigidBody3D", "res://scripts/entities/floating_screen.gd", {"mass": "2.0", "gravity_scale": "0.0"})
+s.box("Bezel", (0.9, 0.56, 0.025), "#2b2f3a", collide=True)
+s.node("Screen", None, ".", instance=s.ext_res("PackedScene", VNC), transform=T(0, 0, 0.0135),
+       unique_name_in_owner="true", screen_size=V2(0.86, 0.52))
+button(s, "KeyboardButton", "Keyboard", (0.33, -0.31, 0.0), (0.18, 0.05), "#4caf50", 30)
+# Held by its bottom edge, screen facing the palm's way.
+s.node("GrabPoint", "Marker3D", transform=T(0, -0.28, 0))
+s.save("scenes/entities/floating_screen.tscn")
+
 # --- Drawers (furniture) ----------------------------------------------------------------------
 s = Scene("Drawers", "RigidBody3D", "res://scripts/entities/drawer.gd", {"mass": "30.0"})
 s.box("Cabinet", (0.5, 0.72, 0.5), "#8a6f55", collide=True)
@@ -129,3 +148,15 @@ s = Scene("VncScreen", "Node3D", "res://scripts/vnc/vnc_screen.gd")
 s.node("Picture", "MeshInstance3D", transform=T(0, 0, 0.001), unique_name_in_owner="true")
 s.label("Status", "", 44, pos=(0, 0, 0.003), pixel=0.001, color="#c8ccd4", outline=0)
 s.save("scenes/vnc/vnc_screen.tscn")
+
+# --- Scrolling text panel (documents, clipboards) ------------------------------------------------
+s = Scene("ScrollText", "Node3D", "res://scripts/ui/scroll_text.gd")
+s.node("Viewport", "SubViewport", unique_name_in_owner="true", transparent_bg="true", disable_3d="true",
+       render_target_update_mode="1", size="Vector2i(320, 320)")
+s.node("Background", "ColorRect", "Viewport", unique_name_in_owner="true")
+s.node("Scroll", "ScrollContainer", "Viewport", unique_name_in_owner="true")
+s.node("Text", "Label", "Viewport/Scroll", unique_name_in_owner="true", text=q(""))
+s.node("Quad", "MeshInstance3D", unique_name_in_owner="true", mesh=s.sub("QuadMesh", size=V2(0.2, 0.2)))
+for name, text in [("Up", "^"), ("Down", "v"), ("Left", "<"), ("Right", ">")]:
+    button(s, name, text, (0, 0, 0), (0.026, 0.026), "#555a66", 22)
+s.save("scenes/ui/scroll_text.tscn")

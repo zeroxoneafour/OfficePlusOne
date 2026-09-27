@@ -23,7 +23,7 @@ shading_mode = 0
 
 [sub_resource type="QuadMesh" id="QuadMesh_6"]
 resource_local_to_scene = true
-size = Vector2(0.5, 0.5)
+size = Vector2(1.6, 0.9)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_7"]
 resource_local_to_scene = true
@@ -38,6 +38,30 @@ material = SubResource("StandardMaterial3D_8")
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_10"]
 size = Vector3(1.65, 0.08, 0.02)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_11"]
+albedo_color = Color(0.1686, 0.1843, 0.2275, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_12"]
+size = Vector3(0.08, 0.95, 0.02)
+material = SubResource("StandardMaterial3D_11")
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_13"]
+size = Vector3(0.08, 0.95, 0.02)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_14"]
+albedo_color = Color(0.3333, 0.3529, 0.4, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_15"]
+size = Vector3(0.014, 0.64, 0.004)
+material = SubResource("StandardMaterial3D_14")
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_16"]
+albedo_color = Color(0.949, 0.8157, 0.4196, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_17"]
+size = Vector3(0.03, 0.1, 0.008)
+material = SubResource("StandardMaterial3D_16")
 
 [node name="Whiteboard" type="RigidBody3D"]
 script = ExtResource("1")
@@ -75,37 +99,30 @@ mesh = SubResource("QuadMesh_4")
 material_override = SubResource("StandardMaterial3D_5")
 unique_name_in_owner = true
 
-[node name="Title" type="Label3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.75, 0.41, 0.006)
-pixel_size = 0.0012
-text = ""
-font_size = 64
-outline_size = 0
-unique_name_in_owner = true
-modulate = Color(0.1059, 0.1059, 0.1059, 1)
-autowrap_mode = 3
-width = 1250
-horizontal_alignment = 0
-vertical_alignment = 0
-
-[node name="Text" type="Label3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.75, 0.32, 0.006)
-pixel_size = 0.0012
-text = ""
-font_size = 46
-outline_size = 0
-unique_name_in_owner = true
-modulate = Color(0.1098, 0.2471, 0.5608, 1)
-autowrap_mode = 3
-width = 1250
-horizontal_alignment = 0
-vertical_alignment = 0
-
-[node name="Picture" type="MeshInstance3D" parent="."]
+[node name="Layer" type="MeshInstance3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.005)
 mesh = SubResource("QuadMesh_6")
 material_override = SubResource("StandardMaterial3D_7")
 unique_name_in_owner = true
+
+[node name="LayerViewport" type="SubViewport" parent="."]
+unique_name_in_owner = true
+transparent_bg = true
+disable_3d = true
+render_target_update_mode = 1
+size = Vector2i(1024, 576)
+
+[node name="Words" type="RichTextLabel" parent="LayerViewport"]
+unique_name_in_owner = true
+bbcode_enabled = true
+scroll_active = false
+autowrap_mode = 3
+text = ""
+
+[node name="Picture" type="TextureRect" parent="LayerViewport"]
+unique_name_in_owner = true
+expand_mode = 1
+stretch_mode = 5
 
 [node name="PaletteBar" type="MeshInstance3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.51, -0.012)
@@ -114,3 +131,37 @@ mesh = SubResource("BoxMesh_9")
 [node name="PaletteBarShape" type="CollisionShape3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.51, -0.012)
 shape = SubResource("BoxShape3D_10")
+
+[node name="ScrollBar" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.865, 0, -0.012)
+mesh = SubResource("BoxMesh_12")
+
+[node name="ScrollBarShape" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.865, 0, -0.012)
+shape = SubResource("BoxShape3D_13")
+
+[node name="ScrollUp" parent="." instance=ExtResource("2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.865, 0.4, 0)
+unique_name_in_owner = true
+text = "^"
+size = Vector2(0.06, 0.07)
+label_size = 40
+color = Color(0.3333, 0.3529, 0.4, 1)
+
+[node name="ScrollDown" parent="." instance=ExtResource("2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.865, -0.4, 0)
+unique_name_in_owner = true
+text = "v"
+size = Vector2(0.06, 0.07)
+label_size = 40
+color = Color(0.3333, 0.3529, 0.4, 1)
+
+[node name="ScrollTrack" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.865, 0, 0.001)
+mesh = SubResource("BoxMesh_15")
+unique_name_in_owner = true
+
+[node name="ScrollThumb" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.865, 0, 0.005)
+mesh = SubResource("BoxMesh_17")
+unique_name_in_owner = true

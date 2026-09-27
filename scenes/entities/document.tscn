@@ -1,13 +1,14 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://bqrq3er4t2w7w"]
 
-[ext_resource type="Script" path="res://scripts/entities/document.gd" id="1"]
+[ext_resource type="Script" uid="uid://dmc0831yawewa" path="res://scripts/entities/document.gd" id="1"]
+[ext_resource type="PackedScene" path="res://scenes/ui/scroll_text.tscn" id="2"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_1"]
 albedo_color = Color(0.9843, 0.9843, 0.9608, 1)
 
 [sub_resource type="BoxMesh" id="BoxMesh_2"]
-size = Vector3(0.22, 0.3, 0.012)
 material = SubResource("StandardMaterial3D_1")
+size = Vector3(0.22, 0.3, 0.012)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_3"]
 size = Vector3(0.22, 0.3, 0.012)
@@ -16,71 +17,59 @@ size = Vector3(0.22, 0.3, 0.012)
 albedo_color = Color(0.2392, 0.5216, 0.7765, 1)
 
 [sub_resource type="BoxMesh" id="BoxMesh_5"]
-size = Vector3(0.08, 0.025, 0.014)
 material = SubResource("StandardMaterial3D_4")
-
-[sub_resource type="QuadMesh" id="QuadMesh_6"]
-resource_local_to_scene = true
-size = Vector2(0.2, 0.2)
+size = Vector3(0.08, 0.025, 0.014)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_7"]
 resource_local_to_scene = true
 shading_mode = 0
 
-[node name="Document" type="RigidBody3D"]
+[sub_resource type="QuadMesh" id="QuadMesh_6"]
+resource_local_to_scene = true
+size = Vector2(0.2, 0.2)
+
+[node name="Document" type="RigidBody3D" unique_id=1868243730]
 mass = 0.3
 script = ExtResource("1")
 
-[node name="Paper" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+[node name="Paper" type="MeshInstance3D" parent="." unique_id=520987705]
 mesh = SubResource("BoxMesh_2")
 
-[node name="PaperShape" type="CollisionShape3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+[node name="PaperShape" type="CollisionShape3D" parent="." unique_id=1629191736]
 shape = SubResource("BoxShape3D_3")
 
-[node name="Tab" type="MeshInstance3D" parent="."]
+[node name="Tab" type="MeshInstance3D" parent="." unique_id=1500205697]
+unique_name_in_owner = true
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.06, 0.155, 0)
 mesh = SubResource("BoxMesh_5")
-unique_name_in_owner = true
 
-[node name="Title" type="Label3D" parent="."]
+[node name="Title" type="Label3D" parent="." unique_id=355743576]
+unique_name_in_owner = true
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.13, 0.0075)
 pixel_size = 0.0005
+modulate = Color(0.102, 0.102, 0.102, 1)
 text = "file"
 font_size = 36
 outline_size = 0
-unique_name_in_owner = true
-modulate = Color(0.102, 0.102, 0.102, 1)
 autowrap_mode = 3
-width = 400
+width = 400.0
 
-[node name="Preview" type="Label3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 0.0075)
-pixel_size = 0.0005
-text = ""
-font_size = 22
-outline_size = 0
+[node name="Preview" parent="." unique_id=460535752 instance=ExtResource("2")]
 unique_name_in_owner = true
-modulate = Color(0.2, 0.2, 0.2, 1)
-autowrap_mode = 3
-width = 400
-horizontal_alignment = 0
-vertical_alignment = 0
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.02013719, 0.0075)
 
-[node name="Picture" type="MeshInstance3D" parent="."]
+[node name="Picture" type="MeshInstance3D" parent="." unique_id=479770193]
+unique_name_in_owner = true
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.02, 0.008)
-mesh = SubResource("QuadMesh_6")
 material_override = SubResource("StandardMaterial3D_7")
-unique_name_in_owner = true
+mesh = SubResource("QuadMesh_6")
 
-[node name="Info" type="Label3D" parent="."]
+[node name="Info" type="Label3D" parent="." unique_id=1143031320]
+unique_name_in_owner = true
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.138, 0.0075)
 pixel_size = 0.0005
-text = ""
+modulate = Color(0.4, 0.4, 0.4, 1)
 font_size = 20
 outline_size = 0
-unique_name_in_owner = true
-modulate = Color(0.4, 0.4, 0.4, 1)
 autowrap_mode = 3
-width = 400
+width = 400.0

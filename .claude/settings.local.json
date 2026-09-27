@@ -134,7 +134,12 @@
       "Bash(sort -t= -k2 -n)",
       "Bash(timeout 200 tests/vnc_selftest.sh)",
       "Bash(timeout 1100 tools/selftest.sh)",
-      "Bash(tools/selftest.sh)"
+      "Bash(tools/selftest.sh)",
+      "Bash(python3 tools/gen_characters.py)",
+      "Bash(grep -n '%Title\\\\|%Text\"\\\\|\"%Text\"\\)\\\\|%Picture\\\\|_drag_and_grab\\(\\)$\\\\|await _drag_and_grab' tests/selftest.gd)",
+      "Bash(SKIP_WHISPER=1 tools/selftest.sh > /tmp/opo_suite.out 2>&1)",
+      "Bash(grep -v \"^--$\")",
+      "Bash(SKIP_WHISPER=1 tools/selftest.sh)"
     ]
   }
 }

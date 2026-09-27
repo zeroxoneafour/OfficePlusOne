@@ -142,3 +142,22 @@ static func axes(parent: Node, length := 0.08) -> Node3D:
 		root.add_child(mi)
 	parent.add_child(root)
 	return root
+
+
+## The shared cartoon look (people, AIs): toon-shaded, soft rim light.
+static func toon(c: Color) -> StandardMaterial3D:
+	var key := "toon|%s" % c.to_html()
+	if _mats.has(key):
+		return _mats[key]
+	var m := StandardMaterial3D.new()
+	m.albedo_color = c
+	m.diffuse_mode = BaseMaterial3D.DIFFUSE_TOON
+	m.specular_mode = BaseMaterial3D.SPECULAR_TOON
+	m.roughness = 0.55
+	m.rim_enabled = true
+	m.rim = 0.35
+	m.rim_tint = 0.6
+	if c.a < 1.0:
+		m.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	_mats[key] = m
+	return m

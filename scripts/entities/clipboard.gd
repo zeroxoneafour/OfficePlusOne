@@ -22,13 +22,13 @@ func _refresh() -> void:
 	var page: int = clampi(int(data.get("page", 0)), 0, maxi(pages.size() - 1, 0))
 	%Title.text = str(data.get("title", ""))
 	var p: Dictionary = pages[page] if page < pages.size() and pages[page] is Dictionary else {}
-	var text := str(p.get("text", "")).substr(0, 900)
+	var text := str(p.get("text", "")) # (scrolls if it's long)
 	var tex: Texture2D = Sync.images.get(int(p.get("image", 0)))
 	%Picture.visible = tex != null
 	if tex:
 		(%Picture.material_override as StandardMaterial3D).albedo_texture = tex
-		text = text.substr(0, 300)
-	%Body.text = text
+	%Body.visible = text != "" or tex == null
+	%Body.set_text(text)
 	%Footer.text = "page %d / %d   (trigger: next)" % [page + 1, pages.size()] if pages.size() > 1 else ""
 
 

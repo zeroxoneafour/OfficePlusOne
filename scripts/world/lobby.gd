@@ -17,11 +17,6 @@ const CELL := Vector2(0.36, 0.065)
 const PLACE_VR := [0.42, 0.45, 35.0]
 const PLACE_DESKTOP := [0.8, 0.2, 10.0]
 
-## Seconds left to keep placing the panel in front of you (the headset's
-## pose settles over the first frames).
-var _placing := 1.5
-
-
 func _ready() -> void:
 	%Hint.text = "Hi %s. Tap a button with your fingertip (desktop: click)." % Config.player_name()
 	%Host.pressed.connect(func(): Net.host(false))
@@ -32,17 +27,11 @@ func _ready() -> void:
 	Saves.saves_changed.connect(_refresh_rooms)
 	_refresh_rooms()
 	_refresh_servers()
+	_place_in_front()
 
 
 func _on_waiting(waiting: bool) -> void:
 	%Status.text = "Knocking… waiting to be let in." if waiting else ""
-
-
-func _process(delta: float) -> void:
-	if _placing > 0.0:
-		_placing -= delta
-		_place_in_front()
-
 
 ## Put the panel in front of wherever you're standing and looking.
 func _place_in_front() -> void:

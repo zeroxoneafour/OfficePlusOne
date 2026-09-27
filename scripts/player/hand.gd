@@ -36,8 +36,7 @@ var _handle: GrabHandle
 ## (open or not) until the hand closes and opens again.
 var _sticky := false
 var _sticky_closed := false
-## The arm inventory this hand stows into and takes from (set on the pointing
-## hand; the inventory is on the other arm). Null for the inventory's own hand.
+## The arm inventory: this hand uses the slot on the other forearm.
 var inventory: ArmInventory
 var _was_trigger := false
 var _joints: Array[MeshInstance3D] = []
@@ -147,7 +146,7 @@ func update_input(grip: bool, trigger: bool) -> void:
 			release()
 	elif grip and not _was_grip:
 		# Something stowed on your other arm, within reach, comes out first.
-		var stowed := inventory.item_near(global_position) if inventory and not held else null
+		var stowed := inventory.item_near(self) if inventory and not held else null
 		# A handle in reach wins over picking the whole thing up.
 		_handle = _nearest_handle() if not held and not stowed else null
 		if stowed:
@@ -248,8 +247,8 @@ func release() -> void:
 	_sticky_closed = false
 	if not held:
 		return
-	# Let go next to an empty slot on your other arm: it goes in there.
-	if inventory and is_instance_valid(held) and inventory.free_slot_near(held, self) >= 0 and inventory.stow(self):
+	# Let go over the slot on your other arm: it goes in there.
+	if inventory and is_instance_valid(held) and inventory.stow(self):
 		return
 	var body := held
 	held = null
@@ -294,7 +293,7 @@ func angular_velocity() -> Vector3:
 ## Is anything within reach to grab? (A fist near an object grabs it rather
 ## than starting the pointer's context-menu gesture.)
 func has_grab_candidate() -> bool:
-	return _nearest_body() != null or _nearest_handle() != null or (inventory != null and inventory.item_near(global_position) != null)
+	return _nearest_body() != null or _nearest_handle() != null or (inventory != null and inventory.item_near(self) != null)
 
 
 ## Something was spawned for this hand (a file pulled from a drawer): take

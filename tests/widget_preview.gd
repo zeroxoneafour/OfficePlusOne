@@ -25,14 +25,20 @@ func _ready() -> void:
 	_make("tv", Vector3(2.5, 1.6, 0), {"name": "Pat's PC"})
 	_make("drawer", Vector3(-0.6, 0.36, 0.6), {"path": "/home/pat/Shared", "open": true})
 	_make("monitor", Vector3(1.0, 0.8, 0.8), {})
+	_make("agent", Vector3(-0.5, 0.0, 2.2), {"name": "Grace", "color": "#e07a5f", "status": "listening"}).rotation.y = PI * 0.92
+	_make("agent", Vector3(0.4, 0.0, 2.4), {"name": "Eric", "color": "#3d85c6", "status": "thinking"}).rotation.y = PI * 1.08
+	_make("floating_screen", Vector3(1.9, 1.3, 1.6), {})
 	# A pie menu and the keyboard, as they float in front of you.
 	var menu: RadialMenu = load("res://scenes/ui/menus/floor_menu.tscn").instantiate()
 	menu.setup({"type": "seat", "entity_id": 0, "point": Vector3.ZERO}, null)
 	add_child(menu)
 	menu.position = Vector3(-1.2, 0.9, 1.6)
 	VirtualKeyboard.open(self, Transform3D(Basis(Vector3.RIGHT, deg_to_rad(-20)), Vector3(0.9, 0.85, 1.7)), "Name this save", "Team room")
+	for e in get_children():
+		if e is NetBody:
+			e.net_target = e.global_transform # client-side copies sit at their network position
 	var cam := Camera3D.new()
-	cam.position = Vector3(0.3, 1.3, 4.6)
+	cam.position = Vector3(0.3, 1.45, 4.3)
 	cam.fov = 70
 	add_child(cam)
 	cam.make_current()
@@ -53,6 +59,5 @@ func _make(kind: String, pos: Vector3, data: Dictionary) -> NetBody:
 	e.data = data
 	add_child(e)
 	e.position = pos
-	e.net_target = e.global_transform # client-side copies sit at their network position
 	e.setup(false)
 	return e

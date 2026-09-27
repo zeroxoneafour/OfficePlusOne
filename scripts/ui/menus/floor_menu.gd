@@ -37,7 +37,7 @@ func _root_items() -> Array:
 
 
 const ADD := [["Chair", "chair"], ["Table", "table"], ["Plant", "plant"], ["Lamp", "lamp"],
-		["Monitor", "monitor"], ["Drawers", "drawer"]]
+		["Monitor", "monitor"], ["Drawers", "drawer"], ["Floating screen", "floating_screen"]]
 
 
 ## Objects appear where the ray hit the floor (furniture arrives locked); the

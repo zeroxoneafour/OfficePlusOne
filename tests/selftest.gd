@@ -55,10 +55,10 @@ func _host() -> void:
 			Net.answer_prompt(id, true))
 	if not Net.in_session:
 		Net.host(false)
-	# Loose toys are no longer in the Add menu, but old saves still hold them;
-	# the tests use one of each as a handy loose object.
-	Sync.spawn("cube", Transform3D(Basis.IDENTITY, Vector3(0.3, 1.0, 0.1)), {"color": "#4f86c6"})
-	Sync.spawn("ball", Transform3D(Basis.IDENTITY, Vector3(-0.3, 1.0, 0.1)), {"color": "#e07a5f"})
+	# Two loose (unlocked) objects to push around: a plant on the table for the
+	# host's tests, and a lamp the client test plays with.
+	Sync.spawn("plant", Transform3D(Basis.IDENTITY, Vector3(0.3, 0.95, 0.1)), {})
+	Sync.spawn("lamp", Transform3D(Basis.IDENTITY, Vector3(-3.0, 0.62, 3.0)), {})
 	_check(not "cube" in Sync.SPAWNABLE and not "ball" in Sync.SPAWNABLE and not "paint" in Sync.SPAWNABLE and "chair" in Sync.SPAWNABLE,
 			"cube, ball and paint aren't addable; chairs are")
 	_check(Sync.entities_of_kind("monitor").size() == 1 and Sync.entities_of_kind("drawer").size() == 1, "new office has a monitor and drawers")
@@ -88,7 +88,7 @@ func _host() -> void:
 	var main_board: WhiteboardWidget = Widgets.find("whiteboard", "Main board")
 	_check(main_board != null and main_board.global_basis.z.dot(Vector3(0, 0, 1)) > 0.99, "a new office has a main whiteboard widget on the north wall")
 	_check(Office.node.get_node_or_null("%Whiteboard") == null and not Office.state.has("board"), "…instead of the old built-in board")
-	_check(main_board != null and main_board.data.get("title") == "Plan" and main_board.get_node("%Title").text == "Plan", "whiteboard text: " + r)
+	_check(main_board != null and main_board.data.get("title") == "Plan" and main_board.shown_text().begins_with("Plan"), "whiteboard text: " + r)
 	r = await AI._run_tool(brain, req, "draw_on_whiteboard", {"title": "Diagram", "svg": "<svg xmlns='http://www.w3.org/2000/svg' width='200' height='100' viewBox='0 0 200 100'><rect x='10' y='10' width='80' height='40' fill='#3d85c6'/><text x='20' y='80'>hi</text></svg>"})
 	_check(main_board != null and int(main_board.data.get("image", 0)) > 0 and main_board.get_node("%Picture").visible, "whiteboard svg: " + r)
 	r = await AI._run_tool(brain, req, "write_on_whiteboard", {"whiteboard_name": "Nope", "title": "x", "text": "y"})
@@ -160,6 +160,7 @@ func _host() -> void:
 	await _pointing_rules()
 	await _pointer_and_menus(id)
 	await _drag_and_grab()
+	await _final_touches()
 	# Rapid spawns must not overlap (overlaps make bodies explode apart).
 	var before := Sync.entities.keys()
 	for i in 8:
@@ -569,7 +570,7 @@ func _room_features(agent_id: int) -> void:
 	var chairs := Sync.entities_of_kind("chair")
 	var table: NetBody = Sync.entities_of_kind("table")[0]
 	_check(chairs.all(func(c): return c.is_locked()) and table.is_locked(), "furniture starts locked")
-	var cube: NetBody = Sync.entities_of_kind("cube")[0] if Sync.entities_of_kind("cube").size() else Sync.entities_of_kind("ball")[0]
+	var cube: NetBody = Sync.entities_of_kind("lamp")[0] # the loose one (the client test's)
 	var cube_kind := cube.kind
 	_check(not cube.is_locked(), "loose objects start unlocked")
 	Office.request_action("lock_all", {"on": true})
@@ -628,12 +629,16 @@ func _room_features(agent_id: int) -> void:
 	Office.request_action("rename", {"name": "Selftest HQ"})
 	Widgets.find("whiteboard", "Main board").server_show({"title": "Saved plan", "text": "keep me"})
 	cube.global_position = Vector3(1.23, 0.5, -1.5)
+	var kinds_before := _kind_counts()
 	var before := {"entities": Sync.entities.size(), "agents": Sync.entities_of_kind("agent").size(),
 			"cube_locked": cube.is_locked(), "size": Office.size()}
 	Saves.delete_file("selftest save")
 	if Widgets.find("timer", ""):
 		_timer_left = Widgets.find("timer", "").time_left()
 	Saves.request_save_as("selftest save")
+	var saved_kinds := {}
+	for ent in Saves.read_file("selftest save").get("entities", []):
+		saved_kinds[ent["kind"]] = saved_kinds.get(ent["kind"], 0) + 1
 	_check(Saves.has_save("selftest save") and Saves.list_saves().any(func(v): return v["name"] == "selftest save"), "saved under a name")
 	# Change the room: delete the cube and the agent, rename, resize.
 	Sync.server_delete(cube.entity_id)
@@ -645,7 +650,8 @@ func _room_features(agent_id: int) -> void:
 	_check(Office.state.get("name") == "Selftest HQ" and Office.size() == before["size"], "load restores the room's name and size")
 	var restored_board: WhiteboardWidget = Widgets.find("whiteboard", "Main board")
 	_check(restored_board != null and restored_board.data.get("title") == "Saved plan" and int(restored_board.data.get("image", 0)) > 0, "…and the whiteboard, with its picture")
-	_check(Sync.entities.size() == before["entities"] and Sync.entities_of_kind("agent").size() == before["agents"], "…all objects and agents")
+	_check(Sync.entities.size() == before["entities"] and Sync.entities_of_kind("agent").size() == before["agents"],
+			"…all objects and agents (before %s, after %s, in the save %s)" % [kinds_before, _kind_counts(), saved_kinds])
 	var testy: Array = Sync.entities_of_kind("agent").filter(func(a): return a.data.get("name") == "Testy")
 	_check(testy.size() == 1, "…including the AI agent (by profile)")
 	var cubes_at := Sync.entities_of_kind(cube_kind).filter(func(c): return c.global_position.distance_to(Vector3(1.23, 0.5, -1.5)) < 0.05)
@@ -757,7 +763,7 @@ func _widgets(agent_id: int) -> void:
 	_check(alarm.alarm_time() == "07:30" and alarm.is_enabled(), "AI sets the alarm: " + r)
 	r = await AI._run_tool(brain, req, "widget_whiteboard", {"whiteboard_name": "Ideas", "text": "Ship it"})
 	r = await AI._run_tool(brain, req, "widget_whiteboard", {"whiteboard_name": "Ideas", "text": "Then party", "mode": "append"})
-	_check(str(board.data.get("text")) == "Ship it\nThen party" and board.get_node("%Text").text == "Ship it\nThen party", "AI writes on the whiteboard")
+	_check(str(board.data.get("text")) == "Ship it\nThen party" and board.shown_text() == "Ship it\nThen party", "AI writes on the whiteboard")
 	var listing: String = await AI._run_tool(brain, req, "widget_list", {})
 	_check(listing.contains("calendar \"Team\"") and listing.contains("alarm \"Alarm\"") and listing.contains("widget_whiteboard(whiteboard_name=\"Ideas\""), "widget_list names every widget and how to use it")
 	# The agent is kept up to date: skill in its system prompt, changes in its context.
@@ -985,6 +991,13 @@ func _drawer() -> void:
 	DirAccess.remove_absolute(dir)
 
 
+static func _kind_counts() -> Dictionary:
+	var out := {}
+	for e in Sync.entities.values():
+		out[e.kind] = out.get(e.kind, 0) + 1
+	return out
+
+
 func _basis_with_y(y: Vector3) -> Basis:
 	var x := y.cross(Vector3.FORWARD if absf(y.z) < 0.9 else Vector3.RIGHT).normalized()
 	return Basis(x, y, x.cross(y).normalized())
@@ -1115,8 +1128,9 @@ func _pointing_rules() -> void:
 	lobby.queue_free()
 
 	# A lock that finds an object in reach right away turns into a grab.
+	# (Its own object: the client test plays with the ball meanwhile.)
 	ptr._set_state(Pointer.State.IDLE)
-	var cube: NetBody = Sync.entities_of_kind("ball")[0]
+	var cube: NetBody = Sync.entities[Sync.spawn("plant", Transform3D(Basis.IDENTITY, Vector3(-3.5, 1.2, -3.5)), {"pinned": true})]
 	hand.global_position = cube.global_position + Vector3(0, 0.6, 1.5)
 	pg.source = "hand"
 	pg.ray_origin = hand.global_position
@@ -1133,7 +1147,9 @@ func _pointing_rules() -> void:
 	await get_tree().physics_frame
 	await get_tree().physics_frame
 	sup = ptr.update_pointer(pg)
-	_check(ptr.state == Pointer.State.IDLE and not sup["grip"], "object in reach before pulling back -> grab wins, no menu")
+	_check(ptr.state == Pointer.State.IDLE and not sup["grip"], "object in reach before pulling back -> grab wins, no menu (state %d, candidate %s, overlapping %s, cube layer %d)" % [
+			ptr.state, hand.has_grab_candidate(), hand.get_node("%GrabArea").get_overlapping_bodies().map(func(b): return b.name), cube.collision_layer])
+	Sync.server_delete(cube.entity_id)
 	rig.queue_free()
 
 
@@ -1195,7 +1211,7 @@ func _pointer_and_menus(agent_id: int) -> void:
 	_check(cg.source == "controller" and cg.pointing and cg.clench == 0.0 and not cg.trigger_started, "controller gestures")
 	# Classification of other targets.
 	var chair: NetBody = Sync.entities_of_kind("chair")[0]
-	var cube: NetBody = Sync.entities_of_kind("cube")[0] if Sync.entities_of_kind("cube").size() else Sync.entities_of_kind("ball")[0]
+	var cube: NetBody = Sync.entities_of_kind("plant")[0] # the loose one on the table
 	_check(Pointer.classify({"collider": chair, "position": chair.global_position})["type"] == "seat", "chair is a seat")
 	_check(Pointer.classify({"collider": cube, "position": cube.global_position})["type"] == "object", "prop is an object")
 	_check(Pointer.classify({"collider": Sync.entities[agent_id], "position": Vector3.ZERO})["type"] == "agent", "agent is an agent")
@@ -1229,7 +1245,7 @@ func _pointer_and_menus(agent_id: int) -> void:
 	floor_menu._activate(floor_menu._current[1])
 	await _wait(0.4)
 	var add_labels: Array = floor_menu._current.map(func(i): return i["label"])
-	_check(add_labels == ["Back", "Chair", "Table", "Plant", "Lamp", "Monitor", "Drawers", "New AI"], "Add menu: %s" % [add_labels])
+	_check(add_labels == ["Back", "Chair", "Table", "Plant", "Lamp", "Monitor", "Drawers", "Floating screen", "New AI"], "Add menu: %s" % [add_labels])
 	floor_menu._activate(floor_menu._current.filter(func(i): return i["label"] == "Plant")[0])
 	var plant: NetBody = Sync.entities_of_kind("plant")[-1]
 	_check(Sync.entities_of_kind("plant").size() == plants + 1 and Vector2(plant.global_position.x - spot.x, plant.global_position.z - spot.z).length() < 1.0,
@@ -1323,7 +1339,7 @@ func _drag_and_grab() -> void:
 	# Grab from the context menu: the object jumps into the hand and stays in
 	# the open hand until it closes and opens again. (Its own test object: the
 	# client test plays with the ball.)
-	var ball: NetBody = Sync.entities[Sync.spawn("cube", Transform3D(Basis.IDENTITY, Vector3(-2, 0.2, 2)), {"color": "#e07a5f"})]
+	var ball: NetBody = Sync.entities[Sync.spawn("plant", Transform3D(Basis.IDENTITY, Vector3(-2, 0.2, 2)), {})]
 	player._open_menu({"type": "object", "entity_id": ball.entity_id, "point": ball.global_position, "hand": 1}, Vector3(0, 1.4, 1))
 	var om: RadialMenu = player._menu
 	await _wait(0.8)
@@ -1348,6 +1364,112 @@ func _drag_and_grab() -> void:
 	await _wait(0.05) # …and the desktop hand opens it again
 	_check(right.held == null and ball.held_by == 0, "closing and opening the hand drops it")
 	Sync.server_delete(ball.entity_id)
+
+
+## Arm slots, the floating screen, rotating, dominant hand, scrolling text,
+## the cartoon faces, the screens' keyboard toggle.
+func _final_touches() -> void:
+	var player: Node3D = get_node_or_null("/root/Main/LocalPlayer")
+	if not player:
+		return
+	var inv: ArmInventory = player.inventory
+	var right: Hand = player.hands[1]
+	# Arm slots: one per forearm; what's there keeps its size, is inert, and
+	# is swapped out by the next thing put in.
+	var doc_id := Files.server_spawn_document(Files.server_add("slot.txt", "in a slot".to_utf8_buffer()), Transform3D(Basis.IDENTITY, Vector3(-1, 1.2, 1)), {"pinned": true})
+	var doc: NetBody = Sync.entities[doc_id]
+	right.fetch(doc, false)
+	_check(right.held == doc, "holding a document")
+	player._desktop_slot(0)
+	_check(right.held == null and doc.is_stowed() and doc.data["stowed"] == [1, 0, 0] and doc.collision_layer == 0, "it goes into the left arm's slot")
+	var paper: Node3D = doc.get_node("Paper")
+	_check(paper.transform.basis.get_scale().is_equal_approx(Vector3.ONE), "…at its own size (files keep their scale)")
+	var drawer_id := Sync.spawn("drawer", Transform3D(Basis.IDENTITY, Vector3(-2, 0.36, 1.5)), {})
+	var drawer: NetBody = Sync.entities[drawer_id]
+	right.fetch(drawer, false)
+	player._desktop_slot(0)
+	await get_tree().physics_frame
+	_check(drawer.is_stowed() and not doc.is_stowed(), "putting something else in the slot drops what was there")
+	var cab: Node3D = drawer.get_node("Cabinet")
+	_check(cab.transform.basis.get_scale().x < 0.9, "…and furniture is shrunk to fit")
+	await get_tree().process_frame
+	await get_tree().process_frame
+	var handle: Area3D = drawer.get_node("%Handle")
+	_check(not handle.monitorable and handle.collision_layer == 0, "…and inert on your arm (its drawer can't be opened)")
+	player._desktop_slot(0)
+	_check(right.held == drawer and not drawer.is_stowed(), "an empty hand takes it back out")
+	await get_tree().process_frame
+	await get_tree().process_frame
+	_check(handle.monitorable and cab.transform.basis.get_scale().is_equal_approx(Vector3.ONE), "…full size and working again")
+	right.release()
+	Sync.server_delete(drawer_id)
+	Sync.server_delete(doc_id)
+	# The floating screen: no physics. It stays exactly where it's let go.
+	Office.request_action("spawn", {"kind": "floating_screen", "point": Vector3(1, 0, 2)})
+	var fs: FloatingScreen = Sync.entities_of_kind("floating_screen")[-1]
+	_check(fs.global_position.y > 1.3 and fs.freeze and fs.collision_mask == 0 and fs.collision_layer == NetBody.LAYER_FLOATING, "floating screen: in mid-air, no collisions")
+	Sync.poses[1]["r"] = Transform3D(Basis.IDENTITY, fs.global_position)
+	Sync.request_grab(fs.entity_id, 1, Transform3D.IDENTITY)
+	await get_tree().physics_frame
+	Sync.poses[1]["r"] = Transform3D(Basis.IDENTITY, Vector3(0.5, 1.7, 1.5)) # (the local player rewrites it every frame)
+	fs._physics_process(0.0)
+	var hand_now: Transform3D = Sync.hand_xform_smooth(1, 1)
+	_check(fs.global_position.distance_to(hand_now.origin) < 0.01, "…follows the hand exactly")
+	Sync.request_release(fs.entity_id, Vector3(5, 0, 0), Vector3.ZERO)
+	var let_go := fs.global_position
+	await _wait(0.4)
+	_check(fs.global_position.distance_to(let_go) < 0.001 and fs.freeze, "…and stays where it's let go (no throw, no fall)")
+	Sync.server_delete(fs.entity_id)
+	# Rotate: 90° about the vertical.
+	var table: NetBody = Sync.entities_of_kind("table")[0]
+	var yaw := table.global_rotation.y
+	Office.request_action("rotate", {"entity": table.entity_id, "degrees": 90})
+	_check(absf(angle_difference(yaw + PI * 0.5, table.global_rotation.y)) < 0.01 and table.global_basis.y.dot(Vector3.UP) > 0.99, "Rotate turns it 90° and keeps it upright")
+	Office.request_action("rotate", {"entity": table.entity_id, "degrees": -90})
+	# Dominant hand: switch to the left and back.
+	player.set_dominant(0)
+	_check(player.dominant == 0 and Config.pref("dominant_hand", "") == "left", "dominant hand: left (remembered)")
+	player.set_dominant(1)
+	_check(player.dominant == 1 and Config.pref("dominant_hand", "") == "right", "…and back to right")
+	# Scrolling: a long document scrolls both ways; a long board scrolls, drawings with it.
+	var long := ""
+	for i in 80:
+		long += "Line %d of a document whose lines are far too long to fit on the page at all.\n" % i
+	var ld: NetBody = Sync.entities[Files.server_spawn_document(Files.server_add("long.txt", long.to_utf8_buffer()), Transform3D(Basis.IDENTITY, Vector3(1, 1.2, 1)), {"pinned": true})]
+	for i in 4:
+		await get_tree().process_frame
+	var st: ScrollText = ld.get_node("%Preview")
+	var over := st.overflow()
+	_check(over.x > 50 and over.y > 200, "a long document overflows both ways (%s)" % over)
+	st.scroll_by(0.5, 1.0)
+	for i in 2:
+		await get_tree().process_frame
+	_check(st.scroll_position().x > 0 and st.scroll_position().y > 0 and st.get_node("%Up").visible and st.get_node("%Left").visible, "…scrolls, with arrows shown")
+	Sync.server_delete(ld.entity_id)
+	var board: WhiteboardWidget = Widgets.find("whiteboard", "Main board")
+	var text := ""
+	for i in 40:
+		text += "Point %d\n" % i
+	board.server_show({"title": "Long list", "text": text})
+	for i in 4:
+		await get_tree().process_frame
+	_check(board.canvas_height() > WhiteboardWidget.TEX.y and board.get_node("%ScrollDown").visible, "long text makes the board scroll (canvas %d px)" % board.canvas_height())
+	board.scroll_by(1.0)
+	var mid := board.face_point(Vector2(0.5, 0.5))
+	var px: Vector2 = board.touch(mid, 0.02)["px"]
+	_check(board.scroll_position() > 0.0 and px.y > WhiteboardWidget.TEX.y * 0.5 + 100.0, "drawing while scrolled lands further down the canvas (y %d)" % px.y)
+	var h_before := board.canvas_height()
+	var pen := BoardPen.new()
+	pen.draw(board, mid, 0.06)
+	pen.lift()
+	_check(board.canvas_height() == h_before, "drawing doesn't make the board bigger")
+	board.scroll_by(-10.0)
+	board.server_show({"title": "Saved plan", "text": "keep me"})
+	# Cartoon faces: they talk and show moods.
+	var agent: AgentBody = Sync.entities_of_kind("agent")[0]
+	var face: MiiHead = agent.get_node("%Face")
+	Sync.set_data(agent.entity_id, "status", "thinking")
+	_check(face.mood == "thinking" and agent.get_node("%StatusLight").get_parent() == agent.get_node("%Head"), "AIs have a cartoon face with a mood, and an antenna light")
 
 
 ## Restart persistence: phase 1 changes the office and closes it (autosave);
@@ -1577,7 +1699,7 @@ func _client() -> void:
 	# Grab a cube remotely.
 	var prop: NetBody
 	for e in Sync.entities.values():
-		if e.kind == "ball": # the host test never touches the ball
+		if e.kind == "lamp" and not e.is_locked(): # the loose lamp (the host test leaves it alone)
 			prop = e
 	if prop:
 		var hand := Node3D.new()

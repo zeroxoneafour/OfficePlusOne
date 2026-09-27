@@ -21,8 +21,10 @@ const RELEASE_BLEND := 0.25
 ## A held body further than this from the hand for a while is let go (stuck behind a wall…).
 const MAX_HOLD_ERROR := 0.7
 
-## Stowed items are shown this big at most (largest side, metres).
-const STOW_SIZE := 0.07
+## Stowed items keep their size unless their largest side is over STOW_MAX
+## (furniture…); those are shrunk to STOW_SIZE.
+const STOW_MAX := 0.5
+const STOW_SIZE := 0.3
 
 var entity_id := 0
 var kind := ""
@@ -153,8 +155,23 @@ func stow_offset() -> Transform3D:
 	return Transform3D(Basis.IDENTITY, -_stow_center)
 
 
-## Shrink (or restore) the visible parts while stowed. Collision is off then.
+## While stowed: shrink huge things to fit the slot, and switch off everything
+## on it that reacts to hands (drawer handles, buttons…) so it's inert until
+## taken out. Collision is off then too.
 func _show_stowed(on: bool) -> void:
+	for a in find_children("*", "Area3D", true, false):
+		var area := a as Area3D
+		if on and not area.has_meta("unstowed_layers"):
+			area.set_meta("unstowed_layers", [area.collision_layer, area.monitoring, area.monitorable])
+			area.set_deferred("collision_layer", 0)
+			area.set_deferred("monitoring", false)
+			area.set_deferred("monitorable", false)
+		elif not on and area.has_meta("unstowed_layers"):
+			var was: Array = area.get_meta("unstowed_layers")
+			area.remove_meta("unstowed_layers")
+			area.set_deferred("collision_layer", was[0])
+			area.set_deferred("monitoring", was[1])
+			area.set_deferred("monitorable", was[2])
 	var parts: Array[Node3D] = []
 	for c in get_children():
 		if c is Node3D and not c is CollisionShape3D and c.name != "LockBadge":
@@ -172,7 +189,8 @@ func _show_stowed(on: bool) -> void:
 		var b: AABB = (global_transform.affine_inverse() * (m as VisualInstance3D).global_transform) * (m as VisualInstance3D).get_aabb()
 		box = b if first else box.merge(b)
 		first = false
-	var s := minf(1.0, STOW_SIZE / maxf(box.get_longest_axis_size(), 0.001)) if not first else 1.0
+	var longest := box.get_longest_axis_size() if not first else 0.0
+	var s := STOW_SIZE / longest if longest > STOW_MAX else 1.0
 	_stow_center = box.get_center() * s
 	for c in parts:
 		if not c.has_meta("unstowed"):

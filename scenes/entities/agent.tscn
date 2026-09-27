@@ -3,13 +3,19 @@
 [ext_resource type="Script" path="res://scripts/entities/agent_body.gd" id="1"]
 [ext_resource type="Script" path="res://scripts/voice/voice_playback.gd" id="2"]
 
+[ext_resource type="PackedScene" path="res://scenes/characters/mii_head.tscn" id="3"]
+
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_1"]
 radius = 0.28
 height = 1.75
 
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_2"]
-radius = 0.24
-height = 1.3
+radius = 0.22
+height = 0.72
+
+[sub_resource type="CapsuleMesh" id="LegMesh"]
+radius = 0.075
+height = 0.8
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_3"]
 albedo_color = Color(0.4824, 0.4078, 0.9333, 1)
@@ -68,6 +74,11 @@ height = 0.07
 radial_segments = 16
 rings = 8
 material = SubResource("StandardMaterial3D_14")
+[sub_resource type="CylinderMesh" id="AntennaMesh"]
+top_radius = 0.004
+bottom_radius = 0.006
+height = 0.08
+radial_segments = 8
 
 [node name="Agent" type="RigidBody3D"]
 mass = 60.0
@@ -79,9 +90,21 @@ script = ExtResource("1")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.875, 0)
 shape = SubResource("CapsuleShape3D_1")
 
+[node name="Legs" type="Node3D" parent="."]
+unique_name_in_owner = true
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
+
+[node name="LegL" type="MeshInstance3D" parent="Legs" groups=["pants"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.09, -0.4, 0)
+mesh = SubResource("LegMesh")
+
+[node name="LegR" type="MeshInstance3D" parent="Legs" groups=["pants"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.09, -0.4, 0)
+mesh = SubResource("LegMesh")
+
 [node name="Body" type="MeshInstance3D" parent="." groups=["tint"]]
 unique_name_in_owner = true
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.75, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.12, 0)
 mesh = SubResource("CapsuleMesh_2")
 material_override = SubResource("StandardMaterial3D_3")
 
@@ -89,18 +112,12 @@ material_override = SubResource("StandardMaterial3D_3")
 unique_name_in_owner = true
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.58, 0)
 
-[node name="Skull" type="MeshInstance3D" parent="Head" groups=["tint_light"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
-mesh = SubResource("SphereMesh_5")
-
-[node name="Visor" type="MeshInstance3D" parent="Head"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.03, -0.14)
-mesh = SubResource("BoxMesh_7")
-
-[node name="Mouth" type="MeshInstance3D" parent="Head"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.07, -0.15)
-mesh = SubResource("BoxMesh_9")
+[node name="Face" parent="Head" instance=ExtResource("3")]
 unique_name_in_owner = true
+
+[node name="Antenna" type="MeshInstance3D" parent="Head"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.17, 0.02)
+mesh = SubResource("AntennaMesh")
 
 [node name="Voice" type="AudioStreamPlayer3D" parent="Head"]
 unique_name_in_owner = true
@@ -125,8 +142,8 @@ outline_size = 8
 unique_name_in_owner = true
 billboard = 1
 
-[node name="StatusLight" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.84, 0)
+[node name="StatusLight" type="MeshInstance3D" parent="Head"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.225, 0.02)
 mesh = SubResource("SphereMesh_15")
 unique_name_in_owner = true
 

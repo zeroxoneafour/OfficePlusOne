@@ -22,7 +22,7 @@ const FULL_SNAP_INTERVAL := 1.0
 const POSE_INTERVAL := 1.0 / 30.0
 ## What people can add from the floor's context menu. (Old saves may still
 ## hold cubes, balls and paint balls; those still load.)
-const SPAWNABLE := ["chair", "table", "plant", "lamp", "monitor", "drawer"]
+const SPAWNABLE := ["chair", "table", "plant", "lamp", "monitor", "drawer", "floating_screen"]
 const Entities := preload("res://scripts/entities/entities.gd")
 ## How far (head to object) direct interactions (trigger / E) reach.
 const INTERACT_REACH := 4.5
@@ -395,55 +395,36 @@ func request_grab(id: int, hand: int, offset: Transform3D) -> void:
 		_grab.rpc_id(1, id, hand, offset)
 
 
-## Put an item into slot `slot` of the arm inventory on `hand` (see ArmInventory).
-func request_stow(id: int, hand: int, slot: int) -> void:
+## Put an item into the arm inventory slot on arm `arm` (0 = left, 1 = right;
+## see ArmInventory). Whatever was in that slot drops out.
+func request_stow(id: int, arm: int, _slot := 0) -> void:
 	if Net.is_server():
-		_srv_stow(Net.my_id(), id, hand, slot)
+		_srv_stow(Net.my_id(), id, arm)
 	else:
-		_stow.rpc_id(1, id, hand, slot)
-
-
-## Your inventory moved to the other arm (dominant hand changed).
-func request_move_inventory(hand: int) -> void:
-	if Net.is_server():
-		_srv_move_inventory(Net.my_id(), hand)
-	else:
-		_move_inventory.rpc_id(1, hand)
+		_stow.rpc_id(1, id, arm)
 
 
 @rpc("any_peer", "reliable")
-func _stow(id: int, hand: int, slot: int) -> void:
-	_srv_stow(multiplayer.get_remote_sender_id(), id, hand, slot)
+func _stow(id: int, arm: int) -> void:
+	_srv_stow(multiplayer.get_remote_sender_id(), id, arm)
 
 
-@rpc("any_peer", "reliable")
-func _move_inventory(hand: int) -> void:
-	_srv_move_inventory(multiplayer.get_remote_sender_id(), hand)
-
-
-func _srv_stow(peer: int, id: int, hand: int, slot: int) -> void:
+func _srv_stow(peer: int, id: int, arm: int) -> void:
 	var e: NetBody = entities.get(id)
 	if not e or not Net.players.has(peer) or not e.grabbable() or e is AgentBody or e.is_locked() or e.is_occupied():
 		return
-	if slot < 0 or slot >= ArmInventory.SLOTS or (e.held_by != 0 and e.held_by != peer):
+	if arm < 0 or arm >= ArmInventory.SLOTS or (e.held_by != 0 and e.held_by != peer):
 		return
 	for other in entities.values():
 		var s: Variant = other.data.get("stowed")
-		if s is Array and s.size() == 3 and int(s[0]) == peer and int(s[2]) == slot and other != e:
-			return # that slot is taken
+		if s is Array and s.size() == 3 and int(s[0]) == peer and int(s[1]) == arm and other != e:
+			_unstow(other) # the slot was full: that drops out
 	if e.held_by == peer:
 		_srv_release(peer, id, Vector3.ZERO, Vector3.ZERO, false)
 	_force_release(e)
 	set_data(id, "agent_holder", 0)
 	set_data(id, "pinned", false)
-	set_data(id, "stowed", [peer, clampi(hand, 0, 1), slot])
-
-
-func _srv_move_inventory(peer: int, hand: int) -> void:
-	for e in entities.values():
-		var s: Variant = e.data.get("stowed")
-		if s is Array and s.size() == 3 and int(s[0]) == peer:
-			set_data(e.entity_id, "stowed", [peer, clampi(hand, 0, 1), int(s[2])])
+	set_data(id, "stowed", [peer, arm, 0])
 
 
 ## Take something out of an arm inventory (it drops, or goes wherever it's being put).
@@ -458,9 +439,9 @@ func _update_stowed() -> void:
 		if not e.is_stowed() or e.held_by != 0:
 			continue
 		var s: Array = e.data["stowed"]
-		var h: Variant = hand_xform_smooth(int(s[0]), int(s[1]))
-		if h is Transform3D:
-			e.global_transform = (h as Transform3D) * ArmInventory.slot_local(int(s[2])) * e.stow_offset()
+		var slot: Variant = ArmInventory.slot_transform(poses.get(int(s[0]), {}), int(s[1]))
+		if slot is Transform3D:
+			e.global_transform = (slot as Transform3D) * e.stow_offset()
 
 
 ## Context menu → Grab: teleport the object into your hand (0 = left,
@@ -542,7 +523,7 @@ func _stand() -> void:
 
 func _srv_interact(peer: int, id: int) -> void:
 	var e: NetBody = entities.get(id)
-	if not e or not Net.can(peer, "interact"):
+	if not e or not Net.can(peer, "interact") or e.is_stowed():
 		return
 	# Must be within reach (the desktop crosshair reaches 4 m; allow for the
 	# object's size). Menu "Sit here" uses Office's "sit" action instead: no limit.

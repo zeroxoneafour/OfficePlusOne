@@ -9,7 +9,8 @@ extends Node
 ## by voice. Tools are permission checked against the human who started the
 ## request.
 
-const NAMES := ["Ada", "Turing", "Grace", "Linus", "Hopper", "Ellis", "Nova", "Quinn", "Juno", "Milo", "Iris", "Otto"]
+const NAMES := ["Adi", "Eric", "Jeffrey", "Krish", "Verity", "Danny",
+	"Danielle", "Lily", "Mariam", "Grace", "Emma", "Serena"]
 const COLORS := ["#7b68ee", "#e07a5f", "#3d85c6", "#81b29a", "#f2cc8f", "#c06c84", "#6c5b7b", "#355c7d"]
 const GESTURES := ["wave", "point", "offer", "think", "shrug", "nod"]
 const TOOLS := preload("res://scripts/ai/tools.gd")
@@ -29,8 +30,8 @@ const TOOL_PERMS := {
 
 ## English best-tts (Kokoro) voices, handed out in turn to new agents. Names
 ## encode accent and gender: af_ = American female, bm_ = British male…
-const VOICES := ["af_heart", "am_michael", "bf_emma", "am_adam", "af_bella", "bm_george",
-		"af_nicole", "am_fenrir", "bf_isabella", "bm_lewis", "af_sarah", "am_puck"]
+const VOICES := ["am_michael", "am_adam", "bm_george", "am_fenrir", "bm_lewis", "am_puck",
+	"af_heart", "bf_emma", "af_bella", "af_nicole", "bf_isabella", "af_sarah"]
 const TTS_RATE := 24000
 
 class Brain:
@@ -43,6 +44,8 @@ class Brain:
 	var listening := false
 	var speak_until := 0.0
 	var status := ""
+	## Which NAMES/VOICES pair it was given (-1: its own name), so it isn't reused.
+	var name_voice_idx := -1
 	## What happened to the wall widgets since this agent last took a turn.
 	var widget_notes: Array[String] = []
 	## The widget list as of this agent's last turn (to spot changes).
@@ -101,33 +104,32 @@ func reset() -> void:
 # --- Agent lifecycle (server) --------------------------------------------------------
 
 func server_create_agent(profile: Dictionary, near_peer: int, xform: Variant = null) -> int:
-	var used := {}
-	for b in _brains.values():
-		used[str(b.profile.get("name", "")).to_lower()] = true
+	var unused_names := range(0, NAMES.size())
+	for b: Brain in _brains.values():
+		unused_names.erase(b.name_voice_idx)
 	var n := _brains.size()
+	var name_voice_idx := randi_range(0, NAMES.size() - 1)
+	if unused_names.size() > 0:
+		name_voice_idx = unused_names[randi_range(0, unused_names.size() - 1)]
 	var p := {
-		"name": "", "persona": "A friendly, capable colleague who is happy to help with anything.",
+		"name": NAMES[name_voice_idx], "persona": "A friendly, capable colleague who is happy to help with anything.",
 		# best-tts voice and speaking speed (0.5-2.0).
-		"voice": VOICES[n % VOICES.size()], "speed": "1.0",
+		"voice": VOICES[name_voice_idx % VOICES.size()], "speed": "1.0",
 		"model": Config.get_value("ai", "model"), "effort": Config.get_value("ai", "effort"),
 		"color": COLORS[n % COLORS.size()],
 	}
 	for k in profile:
 		if str(profile[k]) != "":
 			p[k] = str(profile[k])
-	if p["name"] == "":
-		for nm in NAMES:
-			if not used.has(nm.to_lower()):
-				p["name"] = nm
-				break
-		if p["name"] == "":
-			p["name"] = "Agent %d" % (n + 1)
+		if k == "name" and NAMES.find(p["name"]) != -1:
+			name_voice_idx = NAMES.find(p["name"])
 	var xf: Transform3D = xform if xform is Transform3D else _front_of(near_peer, 1.6)
 	var id := Sync.spawn("agent", xf, {"name": p["name"], "color": p["color"], "status": "idle"})
 	var brain := Brain.new()
 	brain.key = "a%d" % id
 	brain.agent_id = id
 	brain.profile = p
+	brain.name_voice_idx = name_voice_idx if NAMES.find(p["name"]) == name_voice_idx else -1
 	_brains[brain.key] = brain
 	if near_peer != 0:
 		Sync.event(id, "look", {"peer": near_peer})

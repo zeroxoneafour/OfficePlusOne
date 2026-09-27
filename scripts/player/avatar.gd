@@ -1,5 +1,6 @@
 extends Node3D
-## How other humans appear (scenes/player/avatar.tscn): head, hands, torso,
+## How other humans appear (scenes/player/avatar.tscn): a cartoon head
+## (MiiHead) that talks when they do, hands, torso,
 ## name tag, a 3D voice source for proximity chat, their pointing rays, and a
 ## hit body so they can be pointed at (for the context menu).
 
@@ -18,18 +19,22 @@ static func make(peer: int) -> Node3D:
 func _ready() -> void:
 	%HitBody.set_meta("peer", peer_id)
 	voice.volume_db = linear_to_db(maxf(Voice.player_volume(peer_id), 0.0001))
-	var c := Color.from_hsv(fmod(peer_id * 0.137, 1.0), 0.45, 0.85)
-	for m in find_children("*", "MeshInstance3D"):
-		if m.is_in_group("tint"):
-			m.material_override = Mk.mat(c)
-		elif m.is_in_group("tint_dark"):
-			m.material_override = Mk.mat(c.darkened(0.2))
-		elif m.is_in_group("tint_light"):
-			m.material_override = Mk.mat(c.lightened(0.2))
+	# Their shirt colour; face and hands get a cartoon look from their name.
+	%Torso.material_override = Mk.toon(Color.from_hsv(fmod(peer_id * 0.137, 1.0), 0.5, 0.85))
+	_apply_look(str(peer_id))
 
 
 func set_player_name(n: String) -> void:
-	%NameLabel.text = n
+	if %NameLabel.text != n:
+		%NameLabel.text = n
+		_apply_look(n)
+
+
+func _apply_look(key: String) -> void:
+	var look := MiiHead.look_for(key)
+	%Face.set_colors(look["skin"], look["hair"])
+	for h in [%HandL, %HandR]:
+		h.material_override = Mk.toon(look["skin"])
 
 
 func _process(delta: float) -> void:
@@ -37,6 +42,7 @@ func _process(delta: float) -> void:
 	if pose.is_empty():
 		return
 	visible = true
+	%Face.set_talk(clampf(voice.level * 12.0, 0.0, 1.0))
 	var w := 1.0 - exp(-20.0 * delta)
 	var head: Transform3D = pose["head"]
 	%Head.global_transform = %Head.global_transform.interpolate_with(head, w)

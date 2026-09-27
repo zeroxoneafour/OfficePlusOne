@@ -82,9 +82,9 @@ hosting machine:
    a fist** (on a controller, squeeze grip). The ray turns green and a round
    menu appears around your hand.
    - Floor: *Teleport here*, *Add* (chair, table, plant, lamp, monitor,
-     drawers, *New AI*: it appears right where you pointed; furniture arrives
-     locked, and a monitor added next to a table goes on the table), *Summon
-     AI* (pick which).
+     drawers, floating screen, *New AI*: it appears right where you pointed
+     and the menu closes; furniture arrives locked, and a monitor added next
+     to a table goes on the table), *Summon AI* (pick which).
    - Wall: *Add widget* (calendar, alarm, timer, whiteboard, TV: it hangs where you
      pointed), *Wall color*, *All walls*, *Teleport here*.
    - Widget (or its **Menu** button): *Rename…* (keyboard), its own settings
@@ -94,9 +94,11 @@ hosting machine:
    - Object: *Grab* (it jumps into the palm of the hand that opened the menu,
      held by its handle where it has one (a chair by its back, a table by its
      edge…), and stays there even with your hand open; close and open that
-     hand to drop it. Not for locked things), its own items (monitor: *Connect…* / *Disconnect*; drawers:
-     *Open* / *Close*, *Set folder…*), *Lock in place* / *Unlock*, *Delete*
-     (admins; asks to confirm).
+     hand to drop it. Not for locked things), its own items (monitor: *Connect…* / *Keyboard* / *Disconnect*; drawers:
+     *Open* / *Close*, *Set folder…*), *Rotate* (turn it ±15° or ±90° about
+     the vertical, standing it upright; stays open to keep turning), *Lock in
+     place* / *Unlock*, *Delete* (admins; asks to confirm). How *Grab* holds
+     things is tuned by hand: see [docs/GRAB_POINTS.md](docs/GRAB_POINTS.md).
    - AI: *Mute* / *Unmute* its voice and *Point-to-talk: on / off* (whether
      pointing at it talks to it); both just for you, remembered by its name.
      *Delete* (admins; asks to confirm).
@@ -121,10 +123,23 @@ Whatever you're targeting (objects, seats, AIs, people; never walls, floor or
 ceiling) gets a **yellow outline**, even with the ray hidden, so you always
 know what a click or menu will act on. Turn it off in *Me → Highlight*.
 
-**The watch** (left wrist): turn the **back of your left wrist toward your
-eyes** (on controllers, raise your left wrist and look at it) and a watch
-appears with the time and two buttons underneath. Press them with your right
-index finger, or point and pinch or trigger. A red dot means a request is
+**Dominant hand.** You point, and get rays and context menus, with your
+dominant hand only: the right by default, or the left (watch → *Me* →
+*Dominant hand*; remembered). The watch goes on the other wrist.
+
+**Arm slots.** Each forearm has one big slot, a ring on top of it, for
+carrying something while your hands are busy. It's used by the other hand:
+let go of what you're holding over the ring to put it there (if something
+was already in it, that drops out), and close an empty hand on the ring to
+take it back. Things keep their size on your arm (only huge things, like
+furniture, shrink to fit) and are inert there: you can't open a drawer or
+press a button on something on your arm. Desktop: **1** and **2** put what
+you hold on your left / right slot, or take it back with an empty hand.
+
+**The watch** (your non-dominant wrist): turn the **back of that wrist
+toward your eyes** (on controllers, raise it and look at it) and a watch
+appears with the time and two buttons underneath. Press them with your
+pointing hand's index finger, or point and pinch or trigger. A red dot means a request is
 waiting. Menus float above the watch, have **Cancel** in the middle and
 **Back** in submenus, and disappear when you lower your wrist.
 - **Me** (left button): *Mute me* (to other people) · *Rays on/off* ·
@@ -192,12 +207,11 @@ changes held-object distance · drop files on the window to bring them in.
 **The lobby** (before you're in an office) is a panel that appears within
 arm's reach in front of you, tilted up like a lectern, so you can tap it:
 *Host my office* (as you left it), **your saved rooms** (tap one to host
-your office with that room), and offices found on your network. Beside it,
-**New here? Start here** lists the basics, and **Open the tutorial world**
-(also *Tutorial* on the main panel) takes you to a practice office: boards
-with explanations and diagrams on every wall, ray targets to hit, a board to
-draw on, every widget, furniture to grab and lock, drawers of sample files
-and a Tutor AI. The tutorial is private and never saved, so your office is
+your office with that room), and offices found on your network. The big
+**New here? Open the tutorial** button at the top takes you to a practice
+office: boards with explanations and diagrams on every wall, ray targets to
+hit, a board to draw on, every widget, furniture to grab and lock, drawers of
+sample files, a long file to scroll, a floating screen and a Tutor AI. The tutorial is private and never saved, so your office is
 untouched; leave with watch → Me → Switch room.
 
 ## One office per server, and who controls it
@@ -274,7 +288,10 @@ them through the widget MCP tools (below).
   (controller: trigger) while you move the ray. Desktop: hold the left
   button on it and drag. It also shows a title, text and a picture: AIs
   write and draw there, *Write…* in its menu types text, and pressing a
-  document or clipboard against it pins it there. *Wipe* clears the drawing,
+  document or clipboard against it pins it there. Long text never spills off
+  the board: the board's canvas becomes as tall as the text needs (drawing
+  never makes it bigger), and **^ / v** on its right edge (desktop: the mouse
+  wheel over it) scroll it, drawings and all, just for you. *Wipe* clears the drawing,
   the text and picture, or everything. Every office starts with one, the
   **Main board**, on the north wall. It replaces the old built-in board, and
   older saved rooms get their old board's contents moved onto it.
@@ -285,16 +302,20 @@ them through the widget MCP tools (below).
   every headset/PC in the room (e.g. the same network), with a VNC server
   running (e.g. `wayvnc`, `x11vnc`, TigerVNC, macOS Screen Sharing with a VNC
   password, TightVNC on Windows) that allows plain VNC-password or no
-  authentication. There's no mouse control. An admin can turn on
-  *Keyboard* in its menu; then *Type…* opens a live keyboard (with Enter,
-  Tab, Esc and arrow keys; desktop: your real keyboard) whose keys go
-  straight to that computer. The keyboard switches off again when it
-  connects to a different computer. The password is shared with the room
-  and saved with it.
+  authentication. There's no mouse control. Its **Keyboard** button (also
+  in its menu) shows or hides a live keyboard (with Enter, Tab, Esc and
+  arrow keys; desktop: your real keyboard) whose keys go straight to that
+  computer. The password is shared with the room and saved with it.
 
 **Monitors** are furniture that do the same as a TV (the same screen code:
 `scripts/vnc/`, `scripts/entities/remote_display.gd`): point at one →
-*Connect…*.
+*Connect…*. **Floating screens** (floor menu → *Add*) are the same screen
+without any physics: grab one and let go anywhere; it stays exactly there,
+in mid-air (no gravity, no inertia, no bumping into things).
+
+**Documents and clipboards** show their whole text; when it doesn't fit, it
+scrolls, down and (for documents, whose lines don't wrap) sideways: small
+**^ v < >** buttons appear beside the text (desktop: the mouse wheel over it).
 
 **Drawers** are furniture that open onto a folder on the host's computer.
 An admin sets it: point at the drawers → *Set folder…* (keyboard; its
@@ -367,7 +388,14 @@ use the first board (usually *Main board*) without one.
   is saved with the room. They never move on their own, but anyone can grab
   and carry them (agents are never locked), or summon them (point at the
   floor → *Summon AI*). Their head turns to
-  whoever talks to them; a status light shows listening/thinking/speaking.
+  whoever talks to them; a light on their antenna shows
+  listening/thinking/speaking.
+- **Look:** people and AIs share one cartoon style (Wii-Mii-like,
+  `scenes/characters/mii_head.tscn`): round heads with big blinking eyes that
+  glance around, eyebrows, rosy cheeks and a mouth that moves when they talk,
+  toon-shaded bodies and hands. Skin and hair come from their name; shirts
+  from their colour. AIs also wear their mood on their face (brows up when
+  listening, a thoughtful look while thinking) and have an antenna.
 - **Talking:** point at an agent and speak; when you stop pointing, the
   server transcribes it (on-device Whisper), runs Claude with tools (the
   OpenAI fallback if that fails), and the answer comes back as a speech

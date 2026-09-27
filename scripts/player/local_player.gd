@@ -66,7 +66,7 @@ var _rays_visible := true
 var dominant := 1
 ## Outlines whatever you're targeting (watch → Me → Highlight).
 var highlight: TargetHighlight
-## Inventory slots on the non-dominant forearm.
+## One inventory slot on each forearm (used by the other hand).
 var inventory: ArmInventory
 var _toast: Label3D
 var _toast_time := 0.0
@@ -132,7 +132,9 @@ func _ready() -> void:
 	inventory = ArmInventory.new()
 	inventory.name = "ArmInventory"
 	add_child(inventory)
-	_update_inventory_hand()
+	inventory.hands = hands
+	for h in hands:
+		h.inventory = inventory
 	highlight = TargetHighlight.new()
 	add_child(highlight)
 	highlight.enabled = Config.pref("highlight_targets", true) == true
@@ -276,17 +278,7 @@ func set_dominant(side: int) -> void:
 	if watch:
 		watch.close_menu()
 		_update_watch_hand()
-	_update_inventory_hand()
-	if Net.in_session:
-		Sync.request_move_inventory(1 - dominant)
 	dominant_changed.emit(dominant)
-
-
-## The inventory rides on the non-dominant arm; the pointing hand uses it.
-func _update_inventory_hand() -> void:
-	inventory.hand = hands[1 - dominant]
-	hands[1 - dominant].inventory = null
-	hands[dominant].inventory = inventory
 
 
 ## Only the pointing hand presses the watch's buttons (it's on the other wrist).
@@ -422,7 +414,7 @@ func _build_desktop_ui() -> void:
 	_crosshair.add_theme_font_size_override("font_size", 28)
 	ui.add_child(_crosshair)
 	_help = Label.new()
-	_help.text = "Desktop mode — click to look · WASD move · LMB grab/press, or drag on a whiteboard to draw · RMB context menu (walls: add widgets) · E use/sit/switch/open · 1-4 inventory slots · aim at an AI and speak · T type to AI · M mute · Q Me menu · R Room menu · drop files here to import"
+	_help.text = "Desktop mode — click to look · WASD move · LMB grab/press, or drag on a whiteboard to draw · RMB context menu (walls: add widgets) · E use/sit/switch/open · 1/2 arm slots · aim at an AI and speak · T type to AI · M mute · Q Me menu · R Room menu · drop files here to import"
 	_help.position = Vector2(10, 10)
 	ui.add_child(_help)
 	_typing = LineEdit.new()
@@ -445,6 +437,8 @@ func _unhandled_input(event: InputEvent) -> void:
 		if Input.mouse_mode != Input.MOUSE_MODE_CAPTURED and not _typing.visible:
 			Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 			get_viewport().set_input_as_handled()
+		elif event.button_index in [MOUSE_BUTTON_WHEEL_UP, MOUSE_BUTTON_WHEEL_DOWN] and _scroll_under_crosshair(-1.0 if event.button_index == MOUSE_BUTTON_WHEEL_UP else 1.0):
+			pass # scrolled a board or a document's text
 		elif event.button_index == MOUSE_BUTTON_WHEEL_UP:
 			_hand_dist = minf(_hand_dist + 0.1, 3.0)
 		elif event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
@@ -480,7 +474,7 @@ func _unhandled_input(event: InputEvent) -> void:
 				get_viewport().set_input_as_handled()
 			KEY_M:
 				_toggle_mute()
-			KEY_1, KEY_2, KEY_3, KEY_4:
+			KEY_1, KEY_2:
 				_desktop_slot(event.keycode - KEY_1)
 			KEY_Q:
 				open_watch_menu("me")
@@ -488,18 +482,36 @@ func _unhandled_input(event: InputEvent) -> void:
 				open_watch_menu("room")
 
 
-## Desktop: 1-4 put what you hold into that slot, or take its item out.
+## Desktop: the mouse wheel over a whiteboard or a document scrolls it (when
+## you're not holding anything). Returns true if something scrolled.
+func _scroll_under_crosshair(direction: float) -> bool:
+	if hands[1].held:
+		return false
+	var c: Object = _ray().get("collider")
+	if c is WhiteboardWidget:
+		(c as WhiteboardWidget).scroll_by(direction * 0.25)
+		return true
+	if c is NetBody:
+		for n in (c as Node).get_children():
+			if n is ScrollText and n.visible and n.overflow().y > 0.0:
+				(n as ScrollText).scroll_by(0.0, direction * 0.3)
+				return true
+	return false
+
+
+## Desktop: 1 / 2 = the slot on your left / right arm: what you hold goes in
+## (what was there drops out), or with an empty hand, its item comes out.
 func _desktop_slot(slot: int) -> void:
 	var hand := hands[1]
+	var full := inventory.contents()
 	if hand.held:
-		if inventory.contents().has(slot):
-			show_toast("Slot %d is full." % (slot + 1), 2.0)
-		elif inventory.stow(hand, slot):
-			show_toast("Put in slot %d." % (slot + 1), 2.0)
-	elif inventory.contents().has(slot):
-		hand.fetch(inventory.contents()[slot], false)
+		var name_ := str(hand.held.data.get("name", hand.held.kind))
+		inventory.stow(hand, true, slot)
+		show_toast("%s is on your %s arm." % [name_, "left" if slot == 0 else "right"], 2.0)
+	elif full.has(slot):
+		hand.fetch(full[slot], false)
 	else:
-		show_toast("Slot %d is empty (hold something and press %d to put it there)." % [slot + 1, slot + 1], 3.0)
+		show_toast("Your %s arm's slot is empty (hold something and press %d to put it there)." % ["left" if slot == 0 else "right", slot + 1], 3.0)
 
 
 func _process_desktop(delta: float) -> void:
@@ -569,8 +581,6 @@ func _on_typed(text: String) -> void:
 			show_toast("Point at (or face) an AI agent to type to it.")
 			return
 		AI.request_text(target, text)
-		show_toast("You → %s: %s" % [_target_name(target), text])
-
 
 # --- Sitting ------------------------------------------------------------------
 

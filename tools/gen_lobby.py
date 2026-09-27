@@ -33,3 +33,4 @@ s.label("ServersTitle", "Offices on your network:", 24, parent="Panel", pos=(0, 
 s.node("Servers", "Node3D", "Panel", transform=T(0, -0.2, 0), unique_name_in_owner="true")
 s.label("Status", "", 24, parent="Panel", pos=(0, -0.345, 0), pixel=0.0006, color="#f2d06b")
 
+s.save("scenes/world/lobby.tscn")

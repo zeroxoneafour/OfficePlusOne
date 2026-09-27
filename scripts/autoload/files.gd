@@ -6,6 +6,8 @@ extends Node
 ## pull the trigger while holding one to save a copy to their device.
 
 const CHUNK := 48 * 1024
+## How much of a text file its document shows (it scrolls).
+const PREVIEW_CHARS := 20000
 const MIME := {
 	"txt": "text/plain", "md": "text/markdown", "csv": "text/csv", "json": "application/json",
 	"html": "text/html", "htm": "text/html", "xml": "application/xml", "svg": "image/svg+xml",
@@ -71,7 +73,8 @@ func server_spawn_document(file_id: int, xform: Transform3D, extra := {}) -> int
 		return 0
 	var data := {"file_id": file_id, "name": f["name"], "mime": f["mime"], "size": f["bytes"].size(), "preview": "", "image": 0}
 	if is_text(f["mime"]) and f["mime"] != "image/svg+xml":
-		data["preview"] = f["bytes"].slice(0, 2000).get_string_from_utf8().substr(0, 700)
+		# The readable text (scrolls on the document), up to PREVIEW_CHARS.
+		data["preview"] = f["bytes"].slice(0, PREVIEW_CHARS * 4).get_string_from_utf8().substr(0, PREVIEW_CHARS)
 	elif f["mime"] == "image/svg+xml":
 		data["image"] = Sync.add_svg(f["bytes"].get_string_from_utf8())
 	elif is_image(f["mime"]):

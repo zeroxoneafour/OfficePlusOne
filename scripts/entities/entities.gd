@@ -11,6 +11,7 @@ const SCENES := {
 	"lamp": preload("res://scenes/entities/props/lamp.tscn"),
 	"monitor": preload("res://scenes/entities/props/monitor.tscn"),
 	"drawer": preload("res://scenes/entities/props/drawer.tscn"),
+	"floating_screen": preload("res://scenes/entities/floating_screen.tscn"),
 	# Wall widgets (see the Widgets autoload).
 	"calendar": preload("res://scenes/widgets/calendar.tscn"),
 	"alarm": preload("res://scenes/widgets/alarm.tscn"),

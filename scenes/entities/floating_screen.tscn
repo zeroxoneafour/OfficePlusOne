@@ -1,0 +1,44 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/entities/floating_screen.gd" id="1"]
+[ext_resource type="PackedScene" path="res://scenes/vnc/vnc_screen.tscn" id="2"]
+[ext_resource type="PackedScene" path="res://scenes/world/poke_button.tscn" id="3"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_1"]
+albedo_color = Color(0.1686, 0.1843, 0.2275, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_2"]
+size = Vector3(0.9, 0.56, 0.025)
+material = SubResource("StandardMaterial3D_1")
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_3"]
+size = Vector3(0.9, 0.56, 0.025)
+
+[node name="FloatingScreen" type="RigidBody3D"]
+script = ExtResource("1")
+mass = 2.0
+gravity_scale = 0.0
+
+[node name="Bezel" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+mesh = SubResource("BoxMesh_2")
+
+[node name="BezelShape" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+shape = SubResource("BoxShape3D_3")
+
+[node name="Screen" parent="." instance=ExtResource("2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.0135)
+unique_name_in_owner = true
+screen_size = Vector2(0.86, 0.52)
+
+[node name="KeyboardButton" parent="." instance=ExtResource("3")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.33, -0.31, 0)
+unique_name_in_owner = true
+text = "Keyboard"
+size = Vector2(0.18, 0.05)
+label_size = 30
+color = Color(0.298, 0.6863, 0.3137, 1)
+
+[node name="GrabPoint" type="Marker3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.28, 0)

@@ -1,14 +1,14 @@
-[gd_scene format=3 uid="uid://b3q74xxjakcyi"]
+[gd_scene format=3]
 
-[ext_resource type="Script" uid="uid://csqqvd8tm8hmo" path="res://scripts/world/lobby.gd" id="1"]
+[ext_resource type="Script" path="res://scripts/world/lobby.gd" id="1"]
 [ext_resource type="PackedScene" path="res://scenes/world/poke_button.tscn" id="2"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_1"]
 albedo_color = Color(0.2275, 0.2471, 0.2941, 1)
 
 [sub_resource type="BoxMesh" id="BoxMesh_2"]
-material = SubResource("StandardMaterial3D_1")
 size = Vector3(10, 0.2, 10)
+material = SubResource("StandardMaterial3D_1")
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_3"]
 size = Vector3(10, 0.2, 10)
@@ -17,99 +17,101 @@ size = Vector3(10, 0.2, 10)
 albedo_color = Color(0.1647, 0.1765, 0.2039, 1)
 
 [sub_resource type="BoxMesh" id="BoxMesh_5"]
-material = SubResource("StandardMaterial3D_4")
 size = Vector3(0.9, 0.72, 0.02)
+material = SubResource("StandardMaterial3D_4")
 
-[node name="Lobby" type="Node3D" unique_id=1402489729]
+[node name="Lobby" type="Node3D"]
 script = ExtResource("1")
 
-[node name="Floor" type="StaticBody3D" parent="." unique_id=1839722575]
+[node name="Floor" type="StaticBody3D" parent="."]
 
-[node name="Mesh" type="MeshInstance3D" parent="Floor" unique_id=1826011029]
+[node name="Mesh" type="MeshInstance3D" parent="Floor"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.1, 0)
 mesh = SubResource("BoxMesh_2")
 
-[node name="MeshShape" type="CollisionShape3D" parent="Floor" unique_id=389607920]
+[node name="MeshShape" type="CollisionShape3D" parent="Floor"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.1, 0)
 shape = SubResource("BoxShape3D_3")
 
-[node name="Panel" type="Node3D" parent="." unique_id=1720235219]
-unique_name_in_owner = true
+[node name="Panel" type="Node3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 0.819152, -0.573576, 0, 0.573576, 0.819152, 0, 1.05, -0.45)
+unique_name_in_owner = true
 
-[node name="Backing" type="MeshInstance3D" parent="Panel" unique_id=624421378]
+[node name="Backing" type="MeshInstance3D" parent="Panel"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.02)
 mesh = SubResource("BoxMesh_5")
 
-[node name="Title" type="Label3D" parent="Panel" unique_id=1799653046]
-unique_name_in_owner = true
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.1, 0.31, 0)
+[node name="Title" type="Label3D" parent="Panel"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.315, 0)
 pixel_size = 0.0008
 text = "Office Plus One"
 font_size = 60
 outline_size = 8
-
-[node name="Hint" type="Label3D" parent="Panel" unique_id=423098892]
 unique_name_in_owner = true
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.255, 0)
+
+[node name="Hint" type="Label3D" parent="Panel"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.27, 0)
 pixel_size = 0.0006
-font_size = 24
+text = ""
+font_size = 22
 outline_size = 8
+unique_name_in_owner = true
 autowrap_mode = 3
-width = 1400.0
+width = 1400
 
-[node name="TutorialButton" parent="Panel" unique_id=1725327148 instance=ExtResource("2")]
+[node name="TutorialButton" parent="Panel" instance=ExtResource("2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.195, 0)
 unique_name_in_owner = true
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.3, 0.31, 0)
-text = "Tutorial"
-color = Color(0.8784, 0.6275, 0.1882, 1)
-size = Vector2(0.22, 0.07)
-label_size = 26
+text = "New here? Open the tutorial"
+size = Vector2(0.8, 0.09)
+color = Color(0.9412, 0.6275, 0.1255, 1)
+label_size = 40
 
-[node name="Host" parent="Panel" unique_id=1163621084 instance=ExtResource("2")]
+[node name="Host" parent="Panel" instance=ExtResource("2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.2, 0.1, 0)
 unique_name_in_owner = true
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.2, 0.18, 0)
 text = "Host my office"
+size = Vector2(0.36, 0.07)
 color = Color(0.298, 0.6863, 0.3137, 1)
-size = Vector2(0.36, 0.08)
 label_size = 26
 
-[node name="JoinLocal" parent="Panel" unique_id=831042492 instance=ExtResource("2")]
+[node name="JoinLocal" parent="Panel" instance=ExtResource("2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.2, 0.1, 0)
 unique_name_in_owner = true
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.2, 0.18, 0)
 text = "Join localhost"
+size = Vector2(0.36, 0.07)
 color = Color(0.2392, 0.5216, 0.7765, 1)
-size = Vector2(0.36, 0.08)
 label_size = 26
 
-[node name="RoomsTitle" type="Label3D" parent="Panel" unique_id=1605238134]
-unique_name_in_owner = true
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.11, 0)
+[node name="RoomsTitle" type="Label3D" parent="Panel"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.045, 0)
 pixel_size = 0.0006
 text = "Or open one of your saved rooms:"
 font_size = 24
 outline_size = 8
-
-[node name="Rooms" type="Node3D" parent="Panel" unique_id=847083531]
 unique_name_in_owner = true
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.055, 0)
 
-[node name="ServersTitle" type="Label3D" parent="Panel" unique_id=1539824901]
+[node name="Rooms" type="Node3D" parent="Panel"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
 unique_name_in_owner = true
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.1, 0)
+
+[node name="ServersTitle" type="Label3D" parent="Panel"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.145, 0)
 pixel_size = 0.0006
 text = "Offices on your network:"
 font_size = 24
 outline_size = 8
-
-[node name="Servers" type="Node3D" parent="Panel" unique_id=54598416]
 unique_name_in_owner = true
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.155, 0)
 
-[node name="Status" type="Label3D" parent="Panel" unique_id=1733405186]
+[node name="Servers" type="Node3D" parent="Panel"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.2, 0)
 unique_name_in_owner = true
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.32, 0)
+
+[node name="Status" type="Label3D" parent="Panel"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.345, 0)
 pixel_size = 0.0006
-modulate = Color(0.949, 0.8157, 0.4196, 1)
+text = ""
 font_size = 24
 outline_size = 8
+unique_name_in_owner = true
+modulate = Color(0.949, 0.8157, 0.4196, 1)

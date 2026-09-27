@@ -1,9 +1,10 @@
 class_name Tutorial extends RefCounted
-## The tutorial world (lobby → New here? → Open the tutorial world): a private
+## The tutorial world (lobby → "New here? Open the tutorial"): a private
 ## practice office that's never saved (Net.tutorial). Boards on every wall
 ## explain one thing each, with diagrams, and next to them is something to
 ## try it on: targets for the ray, a board to draw on, widgets, furniture to
-## grab and lock, drawers full of sample files, and a Tutor AI.
+## grab and lock, drawers full of sample files, a long document to scroll, a
+## floating screen, and a Tutor AI. The boards' own text scrolls too.
 ##
 ## You arrive facing the north wall: Welcome in the middle, pointing on the
 ## left, menus on the right; then the east (right), west (left) and south
@@ -16,23 +17,25 @@ const SAMPLE_FILES := {
 	"Meeting notes.md": "# Monday sync\n- Ship the widgets\n- Try the tutorial\n- Lunch at 12:30",
 	"Ideas.txt": "1. Whiteboard wall\n2. A timer for stand-ups\n3. Show my screen on the TV",
 }
+## A long file, to practise scrolling (it's on the table).
+const LONG_FILE := "Scroll me! Long files scroll: the ^ v < > buttons beside the text appear when there's more to see (desktop: the mouse wheel over it).\n\n"
 
 const BOARDS := [
 	# [wall, u, height, title, text, diagram]
 	["north", 0.0, 1.6, "Welcome to Office Plus One",
-		"This is a practice room: nothing here is saved.\nEach board teaches one thing; try it on what's next to it.\nStart with pointing (left) and menus (right), then the\nwalls to your right, your left and behind you.\nLeave any time: back of your left wrist to your eyes\n→ Me → Switch room → Lobby (desktop: press Q).", ""],
+		"This is a practice room: nothing here is saved.\nEach board teaches one thing; try it on what's next to it.\nStart with pointing (left) and menus (right), then the\nwalls to your right, your left and behind you.\nYou point with your right hand; if you're left-handed,\nswitch in the watch's Me menu (Dominant hand).\nLeave any time: back of your watch wrist to your eyes\n→ Me → Switch room → Lobby (desktop: press Q).\n\nLong text on a board scrolls: use the ^ and v buttons\non the board's right edge (desktop: the mouse wheel).\nDrawings scroll along with the text.", ""],
 	["north", -3.8, 1.6, "1 · Point and click",
-		"Point: index finger out,\nother fingers curled in.\nA ray comes from your hand.\nClick: keep the ray on a\nbutton and pinch (thumb to\nindex; controller: trigger),\nor poke it with your\nfingertip.\nDesktop: aim + left click.", "point"],
+		"Point: index finger out,\nother fingers curled in.\nA ray comes from your\npointing (dominant) hand.\nClick: keep the ray on a\nbutton and pinch (thumb to\nindex; controller: trigger),\nor poke it with your\nfingertip.\nDesktop: aim + left click.", "point"],
 	["north", 3.8, 1.6, "2 · Context menus",
 		"Point at anything: the floor,\na wall, an object, an AI.\nStart to clench: the ray\nturns yellow and holds.\nPull your fist back ~15 cm\nand a pie menu opens.\nPoke or pinch a slice.\nFist on a menu moves it.\nDesktop: right-click.", "menu"],
 	["east", 0.4, 1.6, "4 · Draw on me",
 		"Pick a colour and a size on the strip under this board.\nDraw with your fingertip on the board, or point at it\nand hold a pinch (controller: trigger) while you move.\nDesktop: hold the left button and drag.\nMenu (top right) → Wipe clears it.", ""],
 	["west", -3.0, 1.6, "5 · Grab and files",
-		"Grab: make a fist near\nsomething (controller: grip).\nLet go mid-swing to throw.\nOr point → menu → Grab: it\njumps into your palm; close\nand open your hand to drop it.\nDrawers (below): pull the\nhandle to browse files, grab\none to take a copy.", "grab"],
+		"Grab: make a fist near\nsomething (controller: grip).\nLet go mid-swing to throw.\nOr point → menu → Grab: it\njumps into your palm; close\nand open your hand to drop it.\nArm slots: each forearm has\none (the ring). Let go of\nsomething over it to carry it\nthere; close an empty hand on\nit to take it back. Putting a\nnew thing in drops the old.\nDesktop: keys 1 and 2.\nDrawers (below): pull the\nhandle to browse files, grab\none to take a copy.", "grab"],
 	["south", -3.5, 1.6, "6 · Your watch and AIs",
-		"Watch: turn the back of your\nleft wrist to your eyes.\nMe: mute, rays, switch room.\nRoom: size, saves, guests.\nAIs: point at one and talk;\nstop pointing to send.\nDesktop: aim at it and talk,\nor press T to type.\nIts menu: Mute, Point-to-talk.", "watch"],
+		"Watch: turn the back of your\nother wrist to your eyes.\nMe: mute, rays, dominant\nhand, switch room.\nRoom: size, saves, guests.\nAIs: point at one and talk;\nstop pointing to send.\nDesktop: aim at it and talk,\nor press T to type.\nIts menu: Mute, Point-to-talk.", "watch"],
 	["south", 3.5, 1.6, "7 · Widgets and typing",
-		"Point at a wall → menu →\nAdd widget: calendar, alarm,\ntimer, whiteboard or TV.\nEach widget's Menu button:\nrename, settings, remove.\nThe keyboard: poke keys,\n#+= for symbols, and a fist\non it moves it.\nPoke a calendar day to add.", "widgets"],
+		"Point at a wall → menu →\nAdd widget: calendar, alarm,\ntimer, whiteboard or TV.\nEach widget's Menu button:\nrename, settings, remove.\nThe keyboard: poke keys,\n#+= for symbols, and a fist\non it moves it.\nPoke a calendar day to add.\nFloating screens (by the\ntable): grab one and let go\nanywhere; it stays put, in\nmid-air. Add more from the\nfloor's menu → Add. TVs and\nscreens show a computer\n(Menu → Connect…); their\nKeyboard button types on it.", "widgets"],
 ]
 
 ## Shape-only diagrams (SVG text isn't rendered): hands, rays, menus.
@@ -105,8 +108,15 @@ static func server_build() -> void:
 	Sync.set_data(drawer_id, "path", ProjectSettings.globalize_path(FILES_DIR))
 	var fid := Files.server_add("Welcome.txt", str(SAMPLE_FILES["Welcome.txt"]).to_utf8_buffer())
 	Files.server_spawn_document(fid, Transform3D(Basis(Vector3.RIGHT, -PI * 0.5), Vector3(2.0, Office.TABLE_TOP + 0.03, 0.5)))
+	var long_text := LONG_FILE
+	for i in 60:
+		long_text += "Line %d: a long line that runs on past the edge of the page, so you can scroll sideways as well as down.\n" % (i + 1)
+	var long_id := Files.server_add("Long file.txt", long_text.to_utf8_buffer())
+	Files.server_spawn_document(long_id, Transform3D(Basis(Vector3.RIGHT, -PI * 0.5), Vector3(2.45, Office.TABLE_TOP + 0.03, 0.5)))
+	# A floating screen to grab and hang anywhere.
+	Sync.spawn("floating_screen", Transform3D(Basis(Vector3.UP, -PI * 0.25), Vector3(3.4, 1.5, 1.8)))
 	# Someone to talk to.
-	AI.server_create_agent({"name": "Tutor", "persona": "You are the Office Plus One tutor, standing in the tutorial room. Help people learn the app: pointing a ray (index finger out, others curled; pinch to click), context menus (point, clench, pull back ~15 cm), the wrist watch (Me and Room menus), grabbing (fist, or Grab from a menu), wall widgets (add from a wall's menu), drawers of files, and talking to AIs (point and talk). Be encouraging and brief, and suggest what to try next."},
+	AI.server_create_agent({"name": "Tutor", "persona": "You are the Office Plus One tutor, standing in the tutorial room. Help people learn the app: pointing a ray (index finger out, others curled; pinch to click), context menus (point, clench, pull back ~15 cm), the wrist watch on the non-pointing wrist (Me and Room menus; Me also picks the dominant hand), grabbing (fist, or Grab from a menu), the slot on each forearm for carrying things, scrolling long text, floating screens, wall widgets (add from a wall's menu), drawers of files, and talking to AIs (point and talk). Be encouraging and brief, and suggest what to try next."},
 			0, Transform3D(Basis(Vector3.UP, PI), Vector3(-1.8, 0.02, -1.6))) # facing you as you arrive
 
 

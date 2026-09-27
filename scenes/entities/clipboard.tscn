@@ -1,13 +1,14 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://dpu18r1eu1sua"]
 
-[ext_resource type="Script" path="res://scripts/entities/clipboard.gd" id="1"]
+[ext_resource type="Script" uid="uid://durbf0kycd1np" path="res://scripts/entities/clipboard.gd" id="1"]
+[ext_resource type="PackedScene" path="res://scenes/ui/scroll_text.tscn" id="2"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_1"]
 albedo_color = Color(0.5451, 0.3529, 0.1686, 1)
 
 [sub_resource type="BoxMesh" id="BoxMesh_2"]
-size = Vector3(0.26, 0.36, 0.012)
 material = SubResource("StandardMaterial3D_1")
+size = Vector3(0.26, 0.36, 0.012)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_3"]
 size = Vector3(0.26, 0.36, 0.012)
@@ -16,80 +17,71 @@ size = Vector3(0.26, 0.36, 0.012)
 albedo_color = Color(0.9843, 0.9843, 0.9608, 1)
 
 [sub_resource type="BoxMesh" id="BoxMesh_5"]
-size = Vector3(0.23, 0.31, 0.002)
 material = SubResource("StandardMaterial3D_4")
+size = Vector3(0.23, 0.31, 0.002)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_6"]
 albedo_color = Color(0.6667, 0.6667, 0.6667, 1)
 
 [sub_resource type="BoxMesh" id="BoxMesh_7"]
-size = Vector3(0.1, 0.03, 0.02)
 material = SubResource("StandardMaterial3D_6")
-
-[sub_resource type="QuadMesh" id="QuadMesh_8"]
-resource_local_to_scene = true
-size = Vector2(0.2, 0.14)
+size = Vector3(0.1, 0.03, 0.02)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_9"]
 resource_local_to_scene = true
 shading_mode = 0
 
-[node name="Clipboard" type="RigidBody3D"]
+[sub_resource type="QuadMesh" id="QuadMesh_8"]
+resource_local_to_scene = true
+size = Vector2(0.2, 0.14)
+
+[node name="Clipboard" type="RigidBody3D" unique_id=906095665]
 mass = 0.4
 script = ExtResource("1")
 
-[node name="Board" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+[node name="Board" type="MeshInstance3D" parent="." unique_id=1611959319]
 mesh = SubResource("BoxMesh_2")
 
-[node name="BoardShape" type="CollisionShape3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+[node name="BoardShape" type="CollisionShape3D" parent="." unique_id=336062954]
 shape = SubResource("BoxShape3D_3")
 
-[node name="Sheet" type="MeshInstance3D" parent="."]
+[node name="Sheet" type="MeshInstance3D" parent="." unique_id=1701563666]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.01, 0.007)
 mesh = SubResource("BoxMesh_5")
 
-[node name="Clip" type="MeshInstance3D" parent="."]
+[node name="Clip" type="MeshInstance3D" parent="." unique_id=498639556]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.17, 0.01)
 mesh = SubResource("BoxMesh_7")
 
-[node name="Title" type="Label3D" parent="."]
+[node name="Title" type="Label3D" parent="." unique_id=1203928964]
+unique_name_in_owner = true
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.135, 0.0085)
 pixel_size = 0.0005
-text = ""
+modulate = Color(0.102, 0.102, 0.102, 1)
 font_size = 44
 outline_size = 0
-unique_name_in_owner = true
-modulate = Color(0.102, 0.102, 0.102, 1)
 autowrap_mode = 3
-width = 420
+width = 420.0
 
-[node name="Body" type="Label3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.11, 0.0085)
-pixel_size = 0.0005
-text = ""
-font_size = 28
-outline_size = 0
+[node name="Body" parent="." unique_id=972976535 instance=ExtResource("2")]
 unique_name_in_owner = true
-modulate = Color(0.1333, 0.1333, 0.1333, 1)
-autowrap_mode = 3
-width = 420
-vertical_alignment = 0
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.028700203, 0.0085)
+size = Vector2(0.21, 0.21)
+font_size = 20
+wrap = true
 
-[node name="Picture" type="MeshInstance3D" parent="."]
+[node name="Picture" type="MeshInstance3D" parent="." unique_id=431571236]
+unique_name_in_owner = true
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.07, 0.009)
-mesh = SubResource("QuadMesh_8")
 material_override = SubResource("StandardMaterial3D_9")
-unique_name_in_owner = true
+mesh = SubResource("QuadMesh_8")
 
-[node name="Footer" type="Label3D" parent="."]
+[node name="Footer" type="Label3D" parent="." unique_id=1333927353]
+unique_name_in_owner = true
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.15, 0.0085)
 pixel_size = 0.0005
-text = ""
+modulate = Color(0.4, 0.4, 0.4, 1)
 font_size = 22
 outline_size = 0
-unique_name_in_owner = true
-modulate = Color(0.4, 0.4, 0.4, 1)
 autowrap_mode = 3
-width = 420
+width = 420.0

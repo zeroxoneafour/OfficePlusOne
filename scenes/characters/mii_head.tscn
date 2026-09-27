@@ -1,0 +1,141 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/characters/mii_head.gd" id="1"]
+
+[sub_resource type="SphereMesh" id="SphereMesh_1"]
+radius = 0.12
+height = 0.24
+radial_segments = 32
+rings = 16
+
+[sub_resource type="SphereMesh" id="SphereMesh_2"]
+radius = 0.12
+height = 0.12
+is_hemisphere = true
+radial_segments = 32
+rings = 10
+
+[sub_resource type="SphereMesh" id="SphereMesh_3"]
+radius = 0.08
+height = 0.16
+radial_segments = 24
+rings = 12
+
+[sub_resource type="SphereMesh" id="SphereMesh_4"]
+radius = 0.02
+height = 0.034
+radial_segments = 16
+rings = 8
+
+[sub_resource type="SphereMesh" id="SphereMesh_5"]
+radius = 0.011
+height = 0.018
+radial_segments = 12
+rings = 6
+
+[sub_resource type="BoxMesh" id="BoxMesh_6"]
+size = Vector3(0.036, 0.007, 0.008)
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_7"]
+top_radius = 0.016
+bottom_radius = 0.016
+height = 0.002
+radial_segments = 16
+
+[sub_resource type="SphereMesh" id="SphereMesh_8"]
+radius = 0.02
+height = 0.034
+radial_segments = 16
+rings = 8
+
+[sub_resource type="SphereMesh" id="SphereMesh_9"]
+radius = 0.011
+height = 0.018
+radial_segments = 12
+rings = 6
+
+[sub_resource type="BoxMesh" id="BoxMesh_10"]
+size = Vector3(0.036, 0.007, 0.008)
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_11"]
+top_radius = 0.016
+bottom_radius = 0.016
+height = 0.002
+radial_segments = 16
+
+[sub_resource type="SphereMesh" id="SphereMesh_12"]
+radius = 0.013
+height = 0.022
+radial_segments = 12
+rings = 6
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_13"]
+radius = 0.006
+height = 0.045
+radial_segments = 12
+rings = 4
+
+[node name="MiiHead" type="Node3D"]
+script = ExtResource("1")
+
+[node name="Face" type="MeshInstance3D" parent="." groups=["skin"]]
+transform = Transform3D(1, 0, 0, 0, 1.1, 0, 0, 0, 1, 0, 0, 0)
+mesh = SubResource("SphereMesh_1")
+
+[node name="Hair" type="MeshInstance3D" parent="." groups=["hair"]]
+transform = Transform3D(1.06, 0, 0, 0, 0.9, 0, 0, 0, 1.08, 0, 0.035, 0.012)
+mesh = SubResource("SphereMesh_2")
+
+[node name="Fringe" type="MeshInstance3D" parent="." groups=["hair"]]
+transform = Transform3D(1.25, 0, 0, 0, 0.3, 0.2, 0, -0.25, 0.55, 0.01, 0.085, -0.07)
+mesh = SubResource("SphereMesh_3")
+
+[node name="EyeL" type="MeshInstance3D" parent="." groups=["eye_white"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.043, 0.02, -0.103)
+unique_name_in_owner = true
+mesh = SubResource("SphereMesh_4")
+
+[node name="PupilL" type="MeshInstance3D" parent="EyeL" groups=["pupil"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.014)
+unique_name_in_owner = true
+mesh = SubResource("SphereMesh_5")
+
+[node name="BrowL" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.043, 0.068, -0.108)
+unique_name_in_owner = true
+mesh = SubResource("BoxMesh_6")
+
+[node name="CheekL" type="MeshInstance3D" parent="." groups=["cheek"]]
+transform = Transform3D(1, 0, 0, 0, 0, 1, 0, -1, 0, -0.07095, -0.03, -0.098)
+mesh = SubResource("CylinderMesh_7")
+
+[node name="EyeR" type="MeshInstance3D" parent="." groups=["eye_white"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.043, 0.02, -0.103)
+unique_name_in_owner = true
+mesh = SubResource("SphereMesh_8")
+
+[node name="PupilR" type="MeshInstance3D" parent="EyeR" groups=["pupil"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.014)
+unique_name_in_owner = true
+mesh = SubResource("SphereMesh_9")
+
+[node name="BrowR" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.043, 0.068, -0.108)
+unique_name_in_owner = true
+mesh = SubResource("BoxMesh_10")
+
+[node name="CheekR" type="MeshInstance3D" parent="." groups=["cheek"]]
+transform = Transform3D(1, 0, 0, 0, 0, 1, 0, -1, 0, 0.07095, -0.03, -0.098)
+mesh = SubResource("CylinderMesh_11")
+
+[node name="Nose" type="MeshInstance3D" parent="." groups=["skin"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.012, -0.123)
+mesh = SubResource("SphereMesh_12")
+
+[node name="Mouth" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.052, -0.11)
+unique_name_in_owner = true
+
+[node name="MouthShape" type="MeshInstance3D" parent="Mouth" groups=["mouth"]]
+transform = Transform3D(0, 1, 0, -1, 0, 0, 0, 0, 1, 0, 0, 0)
+mesh = SubResource("CapsuleMesh_13")

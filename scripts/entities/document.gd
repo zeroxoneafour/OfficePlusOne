@@ -29,7 +29,8 @@ func _refresh() -> void:
 		var aspect := float(tex.get_width()) / maxf(tex.get_height(), 1)
 		(%Picture.mesh as QuadMesh).size = Vector2(0.2, 0.2 / aspect) if aspect >= 1.0 else Vector2(0.2 * aspect, 0.2)
 		(%Picture.material_override as StandardMaterial3D).albedo_texture = tex
-	%Preview.text = "" if tex else str(data.get("preview", ""))
+	%Preview.visible = tex == null
+	%Preview.set_text("" if tex else str(data.get("preview", "")))
 	%Info.text = "%s · %s · trigger: save" % [mime.get_slice("/", 1).substr(0, 20), Files.human_size(int(data.get("size", 0)))]
 	var family := "other"
 	if Files.is_image(mime) or mime == "image/svg+xml":

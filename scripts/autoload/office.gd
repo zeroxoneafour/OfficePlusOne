@@ -220,6 +220,10 @@ func _srv_action(peer: int, action: String, args: Dictionary) -> void:
 			if kind == "agent":
 				if _allowed(peer, "agents"):
 					AI.server_create_agent({}, peer, _facing(peer, point))
+			elif kind == "floating_screen" and _allowed(peer, "spawn"):
+				# At eye height where you pointed, facing you.
+				var xf := _facing(peer, point)
+				Sync.spawn(kind, Transform3D(xf.basis, xf.origin + Vector3(0, 1.4, 0)))
 			elif kind in Sync.SPAWNABLE and _allowed(peer, "spawn"):
 				spawn_object(kind, point)
 		"lock":

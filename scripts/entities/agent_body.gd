@@ -2,8 +2,8 @@ class_name AgentBody extends NetBody
 ## The physical body of an AI agent (scenes/entities/agent.tscn). It never
 ## walks on its own; people can carry it around or summon it. The AI "acts"
 ## through its body: head turns to whoever talks to it, hands gesture and hold
-## items, the mouth moves with its voice and a status light shows
-## idle/listening/thinking/speaking.
+## items, its cartoon face (MiiHead) talks with its voice and shows its mood,
+## and the light on its antenna shows idle/listening/thinking/speaking.
 
 const STATUS_COLORS := {
 	"idle": Color("#888888"), "listening": Color("#33cc55"), "thinking": Color("#ffcc33"),
@@ -11,8 +11,8 @@ const STATUS_COLORS := {
 }
 ## Local position where carried items are held (right hand, slightly out front).
 const HOLD_POINT := Vector3(0.22, 1.1, -0.38)
-## How far a seated agent's upper body drops.
-const SIT_DROP := 0.45
+## How far a seated agent's upper body drops (its legs fold forward).
+const SIT_DROP := 0.7
 const OFFER_POINT := Vector3(0.18, 1.2, -0.5)
 
 @onready var voice: VoicePlayback = %Voice
@@ -36,16 +36,21 @@ func _data_changed(key: String, value: Variant) -> void:
 	match key:
 		"name":
 			%NameLabel.text = str(value)
+			var look := MiiHead.look_for(str(value))
+			%Face.set_colors(look["skin"], look["hair"])
+			for h in [%HandL, %HandR]:
+				h.material_override = Mk.toon(look["skin"])
 		"status":
 			%StatusLight.material_override = Mk.mat(STATUS_COLORS.get(value, Color.GRAY), 2.0)
+			%Face.set_mood(str(value))
 		"sitting_on":
 			# Seated: root sits on the seat, upper body lowered, body shortened.
 			_sit_offset = SIT_DROP if int(value) != 0 else 0.0
-			%Body.position.y = 0.75 - _sit_offset * 0.6
-			%Body.scale.y = 1.0 - _sit_offset * 0.9
+			%Body.position.y = 1.12 - _sit_offset
+			%Legs.position.y = 0.8 - _sit_offset
+			%Legs.rotation.x = PI * 0.5 if _sit_offset > 0.0 else 0.0 # sticking out forward
 			_head.position.y = 1.58 - _sit_offset
 			%NameLabel.position.y = 2.0 - _sit_offset
-			%StatusLight.position.y = 1.84 - _sit_offset
 			%Bubble.position.y = 2.3 - _sit_offset
 			_hand_rest = [Vector3(-0.3, 0.95 - _sit_offset, -0.05), Vector3(0.3, 0.95 - _sit_offset, -0.05)]
 			if _hands.size():
@@ -55,9 +60,9 @@ func _data_changed(key: String, value: Variant) -> void:
 			var c := Mk.color(value, Color("#7b68ee"))
 			for m in find_children("*", "MeshInstance3D"):
 				if m.is_in_group("tint"):
-					m.material_override = Mk.mat(c)
-				elif m.is_in_group("tint_light"):
-					m.material_override = Mk.mat(c.lightened(0.3))
+					m.material_override = Mk.toon(c) # their shirt
+				elif m.is_in_group("pants"):
+					m.material_override = Mk.toon(c.darkened(0.55))
 
 
 func on_event(event_name: String, args: Dictionary) -> void:
@@ -125,7 +130,7 @@ func _process(delta: float) -> void:
 		if _bubble_time <= 0.0:
 			%Bubble.text = ""
 	var talk := voice.level * 60.0
-	%Mouth.scale.y = 1.0 + clampf(talk, 0.0, 5.0)
+	%Face.set_talk(clampf(talk / 5.0, 0.0, 1.0))
 	_update_look(delta)
 
 
