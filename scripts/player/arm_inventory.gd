@@ -29,8 +29,8 @@ var _mats := {}
 
 ## A slot relative to the hand whose forearm it's on: on top of the forearm
 ## (+Y is the back of the hand) a hand's length back from the palm (+Z).
-static func slot_local() -> Transform3D:
-	return Transform3D(Basis.IDENTITY, Vector3(0, 0.06, 0.14))
+static func slot_local(arm: int) -> Transform3D:
+	return Transform3D(Basis.IDENTITY, Vector3(0, -0.22, -0.06)).rotated_local(Vector3(0, 1, 0), deg_to_rad(180)).rotated_local(Vector3(0, 0, 1), deg_to_rad(90 - 180 * arm))
 
 
 ## Desktop (no arms): the two slots sit at the lower corners of your view,
@@ -45,7 +45,7 @@ static func slot_transform(pose: Dictionary, arm: int) -> Variant:
 		var head: Variant = pose.get("head")
 		return (head as Transform3D) * DESKTOP_SLOTS[arm] if head is Transform3D else null
 	var h: Variant = pose.get("l" if arm == 0 else "r")
-	return (h as Transform3D) * slot_local() if h is Transform3D else null
+	return (h as Transform3D) * slot_local(arm) if h is Transform3D else null
 
 func _ready() -> void:
 	for i in SLOTS:
@@ -80,7 +80,7 @@ func slot_world(slot: int) -> Transform3D:
 		var cam := get_viewport().get_camera_3d()
 		if cam:
 			return cam.global_transform * DESKTOP_SLOTS[slot]
-	return hand.global_transform * slot_local()
+	return hand.global_transform * slot_local(slot)
 
 
 ## Your stowed items: slot -> NetBody.

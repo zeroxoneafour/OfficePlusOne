@@ -230,7 +230,7 @@ func server_handle_speech(peer: int, agent_id: int, pcm: PackedFloat32Array) -> 
 	if text == "":
 		Net.send_toast(peer, "Sorry, I didn't catch that.")
 		return
-	Net.send_toast(peer, "You: " + text)
+	#Net.send_toast(peer, "You: " + text)
 	_enqueue(brain, {"peer": peer, "text": "%s says: %s" % [Net.player_name(peer), text]})
 
 

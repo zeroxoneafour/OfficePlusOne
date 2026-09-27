@@ -27,8 +27,9 @@ func _ready() -> void:
 	Saves.saves_changed.connect(_refresh_rooms)
 	_refresh_rooms()
 	_refresh_servers()
-	_place_in_front()
 
+func _process(delta: float) -> void:
+	_place_in_front()
 
 func _on_waiting(waiting: bool) -> void:
 	%Status.text = "Knocking… waiting to be let in." if waiting else ""
